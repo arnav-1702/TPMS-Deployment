@@ -1,0 +1,76 @@
+import mongoose from "mongoose";
+
+const candidateProfileSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true
+  },
+
+  // Classification
+  isFresher: {
+    type: Boolean,
+    default: false
+  },
+  tabType: {
+    type: String,
+    enum: ['experienced', 'fresher'],
+    default: 'fresher'
+  },
+
+  // General Info
+  positionAppliedFor: { type: String },
+  location: { type: String },
+  panIndiaReady: { type: Boolean, default: false },
+  skills: [{ type: String }],
+  noticePeriod: { type: String },
+  concernPerson: { type: String },
+
+  // Salary / Experience (will be cleared if isFresher)
+  yearsOfExperience: { type: Number },
+  currentCTC: { type: String },
+  currentInHandMonthly: { type: String },
+  expectedCTC: { type: String },
+  expectedInHandSalary: { type: String },
+  previousCompany: { type: String },
+  reasonForJobChange: { type: String },
+
+  // Education & Resume
+  education: [{
+    degree: String,
+    institution: String,
+    year: Number
+  }],
+  resume: { type: String },
+
+  // Contact Info
+  contact: {
+    email: { type: String },
+    mobile: { type: String }
+  },
+
+  // Personal Info
+  dob: { type: Date },
+  age: { type: Number }
+
+}, { timestamps: true });
+
+/**
+ * 🛡️ Pre-validation logic:
+ * Clears experience/salary fields if candidate is a fresher.
+ */
+candidateProfileSchema.pre('validate', function (next) {
+  if (this.isFresher) {
+    this.yearsOfExperience = undefined;
+    this.currentCTC = undefined;
+    this.currentInHandMonthly = undefined;
+    this.expectedCTC = undefined;
+    this.expectedInHandSalary = undefined;
+    this.previousCompany = undefined;
+    this.reasonForJobChange = undefined;
+  }
+  next();
+});
+
+export const CandidateProfile = mongoose.model("CandidateProfile", candidateProfileSchema);

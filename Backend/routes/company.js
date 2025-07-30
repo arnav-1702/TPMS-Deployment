@@ -1,0 +1,11 @@
+import express from 'express';
+const router = express.Router();
+import { signupCompany, loginCompany, logoutCompany, updateCompany } from '../controllers/companyController.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+
+router.post('/signup', signupCompany);
+router.post('/login', loginCompany);
+router.post('/logout', authMiddleware, logoutCompany);
+router.put('/update', authMiddleware, updateCompany);
+
+export default router;
