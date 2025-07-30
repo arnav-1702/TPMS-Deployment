@@ -13,6 +13,7 @@ export const postJob = async (req, res) => {
     } = req.body;
     const company = await Company.findById(companyId);
 
+    // changed here
     if (!company || !company.isApproved) {
       return res
         .status(403)
