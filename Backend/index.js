@@ -7,7 +7,7 @@ import adminRoutes from "./routes/admin.js";
 import companyRoutes from "./routes/company.js";
 import jobRoutes from "./routes/job.js";
 import candidateRoutes from "./routes/candidate.js";
-
+import superAdminRoutes from './routes/superAdmin.js';
 dotenv.config();
 
 const app = express();
@@ -26,7 +26,7 @@ app.use('/admin', adminRoutes);
 app.use('/company', companyRoutes);
 app.use('/job', jobRoutes);
 app.use('/candidate', candidateRoutes);
-
+app.use('/superadmin', superAdminRoutes);
 connectDB();
 
 const PORT = process.env.PORT || 8000;

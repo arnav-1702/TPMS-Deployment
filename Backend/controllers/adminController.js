@@ -52,6 +52,18 @@ export const approveCompany = async (req, res) => {
       return res.status(400).json({ message: 'Invalid status' });
     }
 
+    // Check if user is Super Admin
+    if (req.user.role === 'superadmin') {
+      const company = await Company.findById(companyId);
+      if (!company) return res.status(404).json({ message: 'Company not found' });
+
+      company.isApproved = status === 'approved';
+      await company.save();
+      res.status(200).json({ message: 'Company approval updated by Super Admin', company });
+      return;
+    }
+
+    // Regular admin check
     const admin = await Admin.findOne({ email: req.user.email });
     if (!admin) return res.status(404).json({ message: 'Admin not found' });
 
@@ -74,6 +86,17 @@ export const validateJob = async (req, res) => {
     const { jobId, status } = req.body;
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    if (req.user.role === 'superadmin') {
+      const job = await Job.findById(jobId);
+      if (!job) return res.status(404).json({ message: 'Job not found' });
+
+      job.isValid = status === 'approved';
+      job.isPublished = status === 'approved';
+      await job.save();
+      res.status(200).json({ message: 'Job validation updated by Super Admin', job });
+      return;
     }
 
     const admin = await Admin.findOne({ email: req.user.email });
@@ -99,6 +122,19 @@ export const reviewApplication = async (req, res) => {
     const { candidateId, jobId, status } = req.body;
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    if (req.user.role === 'superadmin') {
+      const candidate = await Candidate.findById(candidateId);
+      if (!candidate) return res.status(404).json({ message: 'Candidate not found' });
+
+      const application = candidate.applications.find(app => app.jobId.toString() === jobId);
+      if (!application) return res.status(404).json({ message: 'Application not found' });
+
+      application.status = status;
+      await candidate.save();
+      res.status(200).json({ message: 'Application review updated by Super Admin', candidate });
+      return;
     }
 
     const admin = await Admin.findOne({ email: req.user.email });
@@ -130,9 +166,17 @@ export const logoutAdmin = async (req, res) => {
   }
 };
 
-
 export const getAllJobs = async (req, res) => {
   try {
+    if (req.user.role === 'superadmin') {
+      const jobs = await Job.find().populate('companyId', 'companyName');
+      if (!jobs || jobs.length === 0) {
+        return res.status(404).json({ message: "No jobs found" });
+      }
+      res.status(200).json({ message: "Jobs retrieved successfully by Super Admin", jobs });
+      return;
+    }
+
     const admin = await Admin.findOne({ email: req.user.email });
     if (!admin) return res.status(404).json({ message: 'Admin not found' });
 
