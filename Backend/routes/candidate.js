@@ -5,7 +5,8 @@ import {
   logoutCandidate,
   applyJob,
   completeCandidateProfile,
-  updateCandidateProfile
+  updateCandidateProfile,
+  getCandidateNotifications
 } from '../controllers/candidateController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
@@ -20,5 +21,5 @@ router.post('/logout', authMiddleware, logoutCandidate);
 router.post('/apply', authMiddleware, applyJob);
 router.put('/complete-profile/:candidateId', authMiddleware, completeCandidateProfile);
 router.put('/update-profile/:candidateId', authMiddleware, updateCandidateProfile);
-
+router.get('/notifications', authMiddleware, getCandidateNotifications);
 export default router;

@@ -19,3 +19,6 @@ router.get('/notify', authMiddleware(['company', 'candidate']), async (req, res)
 });
 
 export default router;
+
+
+// to be deleted
