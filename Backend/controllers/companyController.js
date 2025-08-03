@@ -2,7 +2,7 @@ import Company from '../models/companyModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
+import Notification from '../models/notificationModel.js';
 dotenv.config();
 
 export const signupCompany = async (req, res) => {
@@ -87,6 +87,31 @@ export const updateCompany = async (req, res) => {
     await company.save();
     res.status(200).json({ message: 'Company updated', company });
   } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const getCompanyNotifications = async (req, res) => {
+  try {
+    // Read token from cookies
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized: No token provided' });
+    }
+
+    // Verify token and decode user info
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decoded.id;
+
+    // Fetch notifications for the authenticated company
+    const notifications = await Notification.find({
+      recipientId: companyId,
+      recipientModel: 'Company' // Make sure this matches your schema
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json({ notifications });
+  } catch (error) {
+    console.log("here something problem");
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

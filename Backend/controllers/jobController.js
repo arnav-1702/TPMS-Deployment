@@ -31,6 +31,7 @@ export const postJob = async (req, res) => {
     await job.save();
     res.status(201).json({ message: "Job posted, awaiting validation", job });
   } catch (error) {
+    console.log("here is something problem")
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
