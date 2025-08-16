@@ -5,48 +5,115 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import nodemailer from 'nodemailer';
+import { OAuth2Client } from 'google-auth-library';
 
 dotenv.config();
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Signup
+// Helpers
+const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+
+// Email transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+});
+
+// ================= AUTH ================= //
+
+// Signup with OTP
 export const signupCandidate = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if candidate already exists
-    const existingCandidate = await Candidate.findOne({ email });
-    if (existingCandidate) {
-      return res.status(400).json({ message: "Candidate already exists" });
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email address' });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const existingCandidate = await Candidate.findOne({ email });
+    if (existingCandidate) {
+      return res.status(400).json({ message: 'Candidate already exists' });
+    }
 
-    // Create candidate
-    const newCandidate = await Candidate.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 3 * 60 * 1000); // 10 min
+
+    // We send the email first. Note: SMTP can still accept then bounce later.
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Verify your email',
+        text: `Your OTP is ${otp}. It will expire in 10 minutes.`,
+      });
+    } catch (err) {
+      // Immediate SMTP failure (bad domain, connectivity, bad creds, etc.)
+      return res.status(400).json({ message: 'Could not send OTP. Invalid or unreachable email.' });
+    }
+
+    // Save candidate (unverified). If the address is fake and bounces later,
+    // the TTL index will auto-delete this doc after otpExpiry.
+    await Candidate.create({
       name,
       email,
       password: hashedPassword,
+      otp,
+      otpExpiry,
+      isVerified: false,
+      authProvider: 'local',
     });
 
-    // ✅ Create welcome notification (optional)
-    await Notification.create({
-      recipientId: newCandidate._id,
-      recipientModel: "Candidate",
-      message: "Welcome to the recruitment platform!",
-    });
-
-    res.status(201).json({ message: "Candidate registered successfully", candidate: newCandidate });
+    res.status(201).json({ message: 'OTP sent to email. Please verify to activate account.' });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Verify OTP
+export const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const candidate = await Candidate.findOne({ email });
+    if (!candidate) return res.status(404).json({ message: 'Candidate not found' });
+
+    if (!candidate.otp || !candidate.otpExpiry) {
+      return res.status(400).json({ message: 'No OTP pending for this account.' });
+    }
+
+    if (candidate.otp !== otp || candidate.otpExpiry < Date.now()) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    candidate.isVerified = true;
+    candidate.otp = null;
+    candidate.otpExpiry = null;
+    await candidate.save();
+
+    await Notification.create({
+      recipientId: candidate._id,
+      recipientModel: 'Candidate',
+      message: 'Welcome to the recruitment platform!',
+    });
+
+    res.status(200).json({ message: 'Email verified successfully. You can now login.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // Login
 export const loginCandidate = async (req, res) => {
   try {
     const { email, password } = req.body;
     const candidate = await Candidate.findOne({ email });
     if (!candidate) return res.status(401).json({ message: 'Unauthorized' });
+
+    if (!candidate.isVerified) {
+      return res.status(403).json({ message: 'Please verify your email before logging in.' });
+    }
 
     const isMatch = await bcrypt.compare(password, candidate.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
@@ -56,6 +123,38 @@ export const loginCandidate = async (req, res) => {
     res.status(200).json({ message: 'Login successful', token, candidate });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Google Signin
+export const googleSignin = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { email, name } = ticket.getPayload();
+
+    let candidate = await Candidate.findOne({ email });
+    if (!candidate) {
+      candidate = await Candidate.create({
+        name,
+        email,
+        password: null,
+        isVerified: true,
+        authProvider: 'google',
+      });
+    }
+
+    const jwtToken = jwt.sign({ id: candidate._id, email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.cookie('token', jwtToken, { httpOnly: true, maxAge: 3600000 });
+    res.status(200).json({ message: 'Google sign-in successful', token: jwtToken, candidate });
+  } catch (error) {
+    res.status(500).json({ message: 'Google login failed', error: error.message });
   }
 };
 
@@ -69,7 +168,8 @@ export const logoutCandidate = async (req, res) => {
   }
 };
 
-// Complete profile
+// ================= PROFILE ================= //
+
 export const completeCandidateProfile = async (req, res) => {
   try {
     const { candidateId } = req.params;
@@ -86,10 +186,10 @@ export const completeCandidateProfile = async (req, res) => {
     }
 
     await Notification.create({
-  recipientId: candidateId,                 // ✅ Correct field name
-  recipientModel: 'Candidate',              // ✅ Required to support polymorphic ref
-  message: 'Your profile is now complete! You can start applying for jobs.',
-});
+      recipientId: candidateId,
+      recipientModel: 'Candidate',
+      message: 'Your profile is now complete! You can start applying for jobs.',
+    });
 
     res.status(200).json({ message: 'Profile completed', candidate: updatedCandidate });
   } catch (error) {
@@ -97,7 +197,6 @@ export const completeCandidateProfile = async (req, res) => {
   }
 };
 
-// Update profile
 export const updateCandidateProfile = async (req, res) => {
   try {
     const { candidateId } = req.params;
@@ -114,10 +213,10 @@ export const updateCandidateProfile = async (req, res) => {
     }
 
     await Notification.create({
-      recipientId: candidateId,                 // ✅ Correct field name
-  recipientModel: 'Candidate',
+      recipientId: candidateId,
+      recipientModel: 'Candidate',
       message: 'Your profile has been updated.',
-      type: 'profile'
+      type: 'profile',
     });
 
     res.status(200).json({ message: 'Profile updated', candidate: updatedCandidate });
@@ -126,7 +225,8 @@ export const updateCandidateProfile = async (req, res) => {
   }
 };
 
-// Apply for a job
+// ================= JOB ================= //
+
 export const applyJob = async (req, res) => {
   try {
     const { candidateId, jobId } = req.body;
@@ -150,10 +250,10 @@ export const applyJob = async (req, res) => {
     await candidate.save();
 
     await Notification.create({
-      recipientId: candidateId,                 // ✅ Correct field name
-  recipientModel: 'Candidate',
+      recipientId: candidateId,
+      recipientModel: 'Candidate',
       message: `You have applied for the job: "${job?.jobPosition}". Awaiting review.`,
-      type: 'application'
+      type: 'application',
     });
 
     res.status(200).json({ message: 'Job applied, awaiting review', candidate });
@@ -162,22 +262,19 @@ export const applyJob = async (req, res) => {
   }
 };
 
-
+// ================= NOTIFICATIONS ================= //
 
 export const getCandidateNotifications = async (req, res) => {
   try {
     const candidateId = req.user.id;
-    console.log("Fetching notifications for candidate:", candidateId);
 
     const notifications = await Notification.find({
       recipientId: new mongoose.Types.ObjectId(candidateId),
-      recipientModel: "Candidate"
+      recipientModel: 'Candidate',
     }).sort({ createdAt: -1 });
 
     res.status(200).json({ notifications });
   } catch (error) {
-    console.error("Error in getCandidateNotifications:", error);
-    res.status(500).json({ message: "Error fetching notifications" });
+    res.status(500).json({ message: 'Error fetching notifications', error: error.message });
   }
 };
-
