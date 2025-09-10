@@ -1,0 +1,5 @@
+# Ignore node_modules everywhere
+node_modules/
+
+# If you only want to ignore inside Frontend
+Frontend/node_modules/
