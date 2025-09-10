@@ -27,6 +27,8 @@ const CandidateSchema = new mongoose.Schema(
     otp: { type: String, default: null },
     otpExpiry: { type: Date, default: null },
 
+    role: { type: String, default: 'candidate' }, // <-- Added role
+
     applications: [
       {
         jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
@@ -39,7 +41,6 @@ const CandidateSchema = new mongoose.Schema(
 );
 
 // TTL index: auto-delete unverified accounts when otpExpiry passes.
-// (MongoDB scans TTL every ~60s; not instant.)
 CandidateSchema.index(
   { otpExpiry: 1 },
   { expireAfterSeconds: 0, partialFilterExpression: { isVerified: false } }

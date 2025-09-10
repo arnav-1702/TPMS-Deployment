@@ -18,7 +18,7 @@ const seedSuperAdmin = async () => {
 
     const hashedPassword = await bcrypt.hash('superadmin123', 10);
     const superAdmin = {
-      email: 'superadmin@xai.com',
+      email: 'superadmin@123.com',
       password: hashedPassword
     };
 

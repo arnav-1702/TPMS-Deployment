@@ -1,0 +1,82 @@
+import React from "react";
+
+export const LoginCandidate = () => {
+  return (
+    <div className="w-screen h-screen grid grid-cols-1 lg:grid-cols-[3fr_2fr]">
+      {/* Left Side - Card (60% on large, full width on small) */}
+      <div className="flex flex-col justify-center items-center bg-white py-10 px-6 sm:px-10 lg:px-20">
+        <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 md:p-10 w-full max-w-md">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">
+            Login as Candidate
+          </h1>
+          <h2 className="text-lg md:text-xl font-semibold mb-6 text-center">
+            Welcome Back!
+          </h2>
+
+          <form className="w-full space-y-6">
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-base md:text-lg font-medium text-gray-800 mb-2"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                className="w-full border border-gray-400 rounded-md px-3 py-2"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-base md:text-lg font-medium text-gray-800 mb-2"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                className="w-full border border-gray-400 rounded-md px-3 py-2"
+              />
+            </div>
+
+            {/* Button */}
+            <button
+              type="submit"
+              className="w-full py-2 bg-[#a9b5df] text-black rounded-md hover:bg-[#9aa5d0] transition-colors"
+            >
+              Login as Candidate
+            </button>
+          </form>
+
+          {/* Extra link */}
+          <p className="text-center text-gray-600 mt-4 text-sm">
+            Don&apos;t have an account?{" "}
+            <a href="/signup" className="text-[#2d336b] font-semibold hover:underline">
+              Create one
+            </a>
+          </p>
+        </div>
+      </div>
+
+      {/* Right Side - Welcome (40% on large, full width on small) */}
+      <div className="flex flex-col justify-center items-center bg-[#2d336b] text-white px-6 sm:px-10 py-10">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-center">
+          Login Into Your Account <br /> and Enjoy Our Services
+        </h2>
+        <p className="text-base md:text-lg mb-8 text-gray-200 text-center">
+          Join us and find the dream job you are looking for.
+        </p>
+        <img
+          src="https://c.animaapp.com/mf6p998s03ui1q/img/online-registration-and-sign-up-on-computer.png"
+          alt="Login illustration"
+          className="w-[250px] sm:w-[300px] md:w-[350px] h-auto"
+        />
+      </div>
+    </div>
+  );
+};
