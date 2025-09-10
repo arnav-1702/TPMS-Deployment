@@ -1,23 +1,26 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const CompanySchema = new mongoose.Schema({
   companyName: { type: String, required: true, unique: true },
-  domain: { type: String, required: true },
-  jobPosition: { type: String },
-  requirements: { type: String },
-  experienceRequired: { type: String },
-  salaryBudget: { type: Number },
-  noticePeriod: { type: Number },
-  location: { type: String },
-  urgencyStatus: { type: String },
-  noOfCandidatesRequired: { type: Number },
-  competitorCompanyName: { type: String },
-  isApproved: { type: Boolean, default: false },
-  signupDate: { type: Date, default: Date.now },
+  companyDomain: { type: String, required: true },
+  description: { type: String },
+  culture: { type: String },
+  careerGrowth: { type: String },
+  disclaimer: { type: String },
+
   loginCredentials: {
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }
-  }
+    password: { type: String, required: true },
+  },
+
+  // New fields for signup + verification
+  otp: { type: String },
+  otpExpiry: { type: Date },
+  isVerified: { type: Boolean, default: false }, // ✅ verify by OTP
+  isApproved: { type: Boolean, default: false }, // ✅ approved by admin
+
+  role: { type: String, default: "company" },
+  signupDate: { type: Date, default: Date.now },
 });
 
-export default mongoose.model('Company', CompanySchema);
+export default mongoose.model("Company", CompanySchema);

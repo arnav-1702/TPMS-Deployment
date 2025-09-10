@@ -135,12 +135,17 @@ export const loginCandidate = async (req, res) => {
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 
+    // ✅ include role inside JWT payload
     const token = jwt.sign(
-      { email, id: candidate._id },
+      { email, id: candidate._id, role: candidate.role || "candidate" },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
+    // ✅ send as HttpOnly cookie
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
+
+    // ✅ also send role in JSON response
     res.status(200).json({
       message: "Login successful",
       token,
@@ -148,16 +153,22 @@ export const loginCandidate = async (req, res) => {
         _id: candidate._id,
         name: candidate.name,
         email: candidate.email,
-        role: candidate.role || "candidate", // ✅ ensures role is included
+        role: candidate.role || "candidate", // always included
         isProfileComplete: candidate.isProfileComplete,
         applications: candidate.applications,
-        // any other fields you want to send
+        // add other fields as needed
       },
     });
+    console.log("Login successful:", {
+  status: 200,
+  token,
+  role: candidate.role || "candidate",
+});
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 // Google Signin
 export const googleSignin = async (req, res) => {

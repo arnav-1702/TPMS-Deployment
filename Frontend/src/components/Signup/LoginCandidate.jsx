@@ -1,9 +1,39 @@
-import React from "react";
-
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginCandidateAPI } from "../../services/api"; // ✅ make sure this API is defined
+import { AuthContext } from "../../../Authentication/AuthProvider"
 export const LoginCandidate = () => {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await loginCandidateAPI({ email, password });
+
+      // ✅ Save candidate info to localStorage (for later use)
+      localStorage.setItem("candidate", JSON.stringify(res.data.candidate));
+
+      alert("Login successful!");
+      login("candidate", res.data.candidate);
+      navigate("/"); // redirect to homepage or candidate dashboard
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="w-screen h-screen grid grid-cols-1 lg:grid-cols-[3fr_2fr]">
-      {/* Left Side - Card (60% on large, full width on small) */}
+      {/* Left Side - Card */}
       <div className="flex flex-col justify-center items-center bg-white py-10 px-6 sm:px-10 lg:px-20">
         <div className="bg-white shadow-lg rounded-2xl p-6 sm:p-8 md:p-10 w-full max-w-md">
           <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">
@@ -13,7 +43,12 @@ export const LoginCandidate = () => {
             Welcome Back!
           </h2>
 
-          <form className="w-full space-y-6">
+          <form className="w-full space-y-6" onSubmit={handleSubmit}>
+            {/* Error */}
+            {error && (
+              <p className="text-red-500 text-center text-sm">{error}</p>
+            )}
+
             {/* Email */}
             <div>
               <label
@@ -25,7 +60,10 @@ export const LoginCandidate = () => {
               <input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-400 rounded-md px-3 py-2"
+                required
               />
             </div>
 
@@ -40,30 +78,37 @@ export const LoginCandidate = () => {
               <input
                 id="password"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-gray-400 rounded-md px-3 py-2"
+                required
               />
             </div>
 
             {/* Button */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full py-2 bg-[#a9b5df] text-black rounded-md hover:bg-[#9aa5d0] transition-colors"
             >
-              Login as Candidate
+              {loading ? "Logging in..." : "Login as Candidate"}
             </button>
           </form>
 
           {/* Extra link */}
           <p className="text-center text-gray-600 mt-4 text-sm">
             Don&apos;t have an account?{" "}
-            <a href="/signup" className="text-[#2d336b] font-semibold hover:underline">
+            <a
+              href="/signupcandidate"
+              className="text-[#2d336b] font-semibold hover:underline"
+            >
               Create one
             </a>
           </p>
         </div>
       </div>
 
-      {/* Right Side - Welcome (40% on large, full width on small) */}
+      {/* Right Side - Welcome */}
       <div className="flex flex-col justify-center items-center bg-[#2d336b] text-white px-6 sm:px-10 py-10">
         <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-center">
           Login Into Your Account <br /> and Enjoy Our Services

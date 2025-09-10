@@ -12,6 +12,10 @@ import { LoginCompany } from './components/Signup/LoginCompany';
 import { Home } from './components/home/Home.jsx';
 import { VerifyOtp } from './components/Signup/VerifyOtp.jsx';
 import JobDetailsPage from './candidate/JobDetailsPage';
+import { CommonSignup } from './components/Signup/CommonSignup';
+import { CommonLogin } from './components/Signup/CommonLogin';
+import { VerifyCompanyOtp } from './components/Signup/VerifyCompanyOtp';
+import { CompanyPendingApproval } from './components/Signup/CompanyPendingApproval';
 
 
 function App() {
@@ -29,6 +33,10 @@ function App() {
           <Route path="/logincompany" element={<LoginCompany/>} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/companyid/jobid/jobdetails" element={<JobDetailsPage />} />
+          <Route path="/commonsignup" element={<CommonSignup />} />
+          <Route path="/commonlogin" element={<CommonLogin />} />
+          <Route path="/verify-company-otp" element={<VerifyCompanyOtp />} />
+          <Route path="/company-pending" element={<CompanyPendingApproval />} />
         </Routes>
       </div>
       

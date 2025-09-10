@@ -1,97 +1,162 @@
 // Navbar.js
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../Authentication/AuthProvider";
-
+import { logoutCandidateAPI, logoutCompanyAPI } from "../../services/api";
 const Navbar = () => {
-  const { role, logout } = useContext(AuthContext);
+  const { role, user, logout } = useContext(AuthContext); 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+  await logout();   // now logout handles API + cleanup
+  navigate("/");
+};
 
   return (
-    <div className="bg-white">
-      {/* Header */}
-      <header className="w-full flex items-center justify-between px-16 py-6 shadow-sm">
-        {/* Logo */}
-        <div className="flex-shrink-0">
-          <div className="w-20 h-12 bg-[#666565]"></div>
-        </div>
+    <header className="w-full flex items-center justify-between px-6 sm:px-10 lg:px-16 py-4 shadow-sm bg-white">
+      {/* Logo */}
+      <div className="flex-shrink-0">
+        <div className="w-20 h-12 bg-[#666565]"></div>
+      </div>
 
-        {/* Navigation - Centered */}
-        <nav className="hidden md:flex space-x-12 text-2xl">
-          <a href="#" className="text-[#2D336B] font-medium">
-            Home
-          </a>
+      {/* Middle Nav Links */}
+      <nav className="hidden md:flex space-x-8 text-lg font-medium">
+        <Link to="/" className="text-[#2D336B] hover:text-blue-600">
+          Home
+        </Link>
 
-          {/* Candidate Navbar */}
-          {role === "candidate" && (
-            <>
-              <a href="#" className="text-[#2D336B] font-medium">
-                Find a Job
-              </a>
-              <a href="#" className="text-[#2D336B] font-medium">
-                Companies
-              </a>
-              <a href="#" className="text-[#2D336B] font-medium">
-                About Us
-              </a>
-            </>
-          )}
+        {/* Candidate (logged in OR not) */}
+        {(!role || role === "candidate") && (
+          <>
+            <Link to="/jobs" className="text-[#2D336B] hover:text-blue-600">
+              Find a Job
+            </Link>
+            {!role && (
+      <Link to="/signupcompany" className="text-[#2D336B] hover:text-blue-600">
+        For Employers
+      </Link>
+    )}
+            <Link to="/about" className="text-[#2D336B] hover:text-blue-600">
+              About Us
+            </Link>
+          </>
+        )}
 
-          {/* Company Navbar */}
-          {role === "company" && (
-            <>
-              <a href="#" className="text-[#2D336B] font-medium">
-                Post a Job
-              </a>
-              <a href="#" className="text-[#2D336B] font-medium">
-                Applicants
-              </a>
-              <a href="#" className="text-[#2D336B] font-medium">
-                About Us
-              </a>
-            </>
-          )}
-        </nav>
+        {/* Company (only logged in) */}
+        {role === "company" && (
+          <>
+            <Link to="/post-job" className="text-[#2D336B] hover:text-blue-600">
+              Post a Job
+            </Link>
+            <Link to="/applicants" className="text-[#2D336B] hover:text-blue-600">
+              Applicants
+            </Link>
+            <Link to="/about" className="text-[#2D336B] hover:text-blue-600">
+              About Us
+            </Link>
+          </>
+        )}
+      </nav>
 
-        {/* Avatar / Notification */}
-        <div className="flex items-center space-x-6">
-          {/* Candidate Notification Bell */}
-          {role === "candidate" && (
-            <svg
-              className="w-7 h-7 text-[#2D336B]"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 24c1.1 0 2-.9 2-2H10c0 
-                       1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V6c0-.83-.67-1.5-1.5-1.5S10 
-                       5.17 10 6v.68C7.14 7.36 5.5 
-                       9.92 5.5 13v5l-1.5 1.5V20h16v-.5L18 18z" />
-            </svg>
-          )}
+      {/* Right Side */}
+      <div className="relative">
+        {/* Not logged in */}
+        {!role && (
+          <Link
+            to="/commonlogin"
+            className="px-4 py-2 rounded-md bg-[#2D336B] text-white hover:bg-[#3f4a8a]"
+          >
+            Login
+          </Link>
+        )}
 
-          {/* Avatar */}
-          <div className="w-16 h-16 bg-[#2D336B] rounded-full flex items-center justify-center">
-            <svg
-              className="w-6 h-6 text-white"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 
-                       1.79-4 4 1.79 4 4 4zm0 2c-2.67 
-                       0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-          </div>
-
-          {/* Logout button (visible when logged in as company) */}
-          {role === "company" && (
+        {/* Logged in */}
+        {role && (
+          <div>
             <button
-              onClick={logout}
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center space-x-3 focus:outline-none"
             >
-              Logout
+              <div className="w-12 h-12 bg-[#2D336B] rounded-full flex items-center justify-center text-white text-lg">
+                {user?.name?.[0] || "A"}
+              </div>
+              <span className="hidden sm:inline text-[#2D336B] font-medium">
+                {user?.name || "User"}
+              </span>
             </button>
-          )}
-        </div>
-      </header>
-    </div>
+
+            {/* Dropdown */}
+            {menuOpen && (
+              <div className="absolute right-0 mt-3 w-64 bg-[#E8EDFF] shadow-lg rounded-md overflow-hidden z-20">
+                {/* Header */}
+                <div className="px-4 py-3 bg-[#2D336B] text-white font-semibold">
+                  {role === "company" ? user?.companyName || "Company" : user?.name}
+                </div>
+
+                {/* Menu Items */}
+                <ul className="divide-y divide-gray-200">
+                  {role === "candidate" && (
+                    <>
+                      <li>
+                        <Link to="/applied-jobs" className="block px-4 py-3 hover:bg-gray-100">
+                          Applied Jobs
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/contact" className="block px-4 py-3 hover:bg-gray-100">
+                          Contact Us
+                        </Link>
+                      </li>
+                    </>
+                  )}
+
+                  {role === "company" && (
+                    <>
+                      <li>
+                        <span className="block px-4 py-3 font-medium text-gray-700">
+                          Admin: {user?.name}
+                        </span>
+                      </li>
+                      <li>
+                        <Link to="/dashboard" className="block px-4 py-3 hover:bg-gray-100">
+                          Dashboard
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/verifications" className="block px-4 py-3 hover:bg-gray-100">
+                          Job Verifications
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/contact" className="block px-4 py-3 hover:bg-gray-100">
+                          Contact Us
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/shortlisted" className="block px-4 py-3 hover:bg-gray-100">
+                          Shortlisted Candidates
+                        </Link>
+                      </li>
+                    </>
+                  )}
+
+                  {/* Logout */}
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-3 text-red-600 hover:bg-gray-100"
+                    >
+                      Log Out
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </header>
   );
 };
 

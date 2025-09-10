@@ -1,9 +1,10 @@
 import express from 'express';
 const router = express.Router();
-import { signupCompany, loginCompany, logoutCompany, updateCompany } from '../controllers/companyController.js';
+import { signupCompany, loginCompany, logoutCompany, updateCompany, verifyCompanyOtp } from '../controllers/companyController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { getCompanyNotifications } from '../controllers/companyController.js';
 router.post('/signup', signupCompany);
+router.post('/verify-otp', verifyCompanyOtp);
 router.post('/login', loginCompany);
 router.post('/logout', authMiddleware, logoutCompany);
 router.put('/update', authMiddleware, updateCompany);
