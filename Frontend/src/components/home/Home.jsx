@@ -4,6 +4,7 @@ import Page1 from './page1.jsx'
 import Page2 from './page2.jsx'
 import Footer from './Footer.jsx'
 import Navbar from './Navbar.jsx'
+import Page3 from './Page3.jsx'
 
 
 export const Home = () => {
@@ -12,7 +13,9 @@ export const Home = () => {
       <Navbar></Navbar>
       <Page1></Page1>
       <Page2></Page2>
-      <Footer></Footer>
+   
+      <Page3></Page3>
+         <Footer></Footer>
     </div>
   )
 }

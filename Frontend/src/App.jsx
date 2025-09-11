@@ -16,6 +16,8 @@ import { CommonSignup } from './components/Signup/CommonSignup';
 import { CommonLogin } from './components/Signup/CommonLogin';
 import { VerifyCompanyOtp } from './components/Signup/VerifyCompanyOtp';
 import { CompanyPendingApproval } from './components/Signup/CompanyPendingApproval';
+import JobCards from './candidate/JobCards';
+import JobCard from './candidate/JobCard';
 
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
           <Route path="/commonlogin" element={<CommonLogin />} />
           <Route path="/verify-company-otp" element={<VerifyCompanyOtp />} />
           <Route path="/company-pending" element={<CompanyPendingApproval />} />
+          <Route path="/jobcards" element={<JobCards/>} />
+          <Route path="/jobs" element={<JobCard/>} />
         </Routes>
       </div>
       

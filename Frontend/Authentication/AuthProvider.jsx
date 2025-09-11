@@ -12,26 +12,33 @@ export const AuthProvider = ({ children }) => {
 
   // Run on app start
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/api/auth/me", {
-          withCredentials: true, // 👈 sends cookies
-        });
-        setRole(res.data.role);
-        setUser(res.data.user);
+  const checkSession = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/auth/me", {
+        withCredentials: true,
+      });
+      setRole(res.data.role);
+      setUser(res.data.user);
 
-        localStorage.setItem("role", res.data.role);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-      } catch (err) {
-        // ❌ Invalid or missing cookie → logout
-        logout();
-      } finally {
-        setLoading(false);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+    } catch (err) {
+      // ❌ Ignore 404 errors silently
+      if (err.response?.status !== 404) {
+        console.error("Auth check failed:", err.message);
       }
-    };
+      // ❌ Still clear auth state if cookie invalid
+      setRole(null);
+      setUser(null);
+      localStorage.removeItem("role");
+      localStorage.removeItem("user");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    checkSession();
-  }, []);
+  checkSession();
+}, []);
 
   const login = (role, userData) => {
     setRole(role);
