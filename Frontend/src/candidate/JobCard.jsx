@@ -1,20 +1,25 @@
 import React from "react";
-
-const JobCard = ({ image, title, buttonText, href }) => {
+function JobCard({ title, icon, companyName }) {
   return (
-    <div className="flex flex-col items-center bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 w-64">
-      <img src={image} alt={title} className="h-12 w-12 mb-4 object-contain" />
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
-      {buttonText && (
-        <a
-          href={href}
-          className="px-4 py-2 text-sm bg-[#2D336B] text-white rounded-lg hover:bg-[#1f244d] transition"
-        >
-          {buttonText}
-        </a>
-      )}
+    <div className="bg-[#e9ebfd] rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow w-full">
+      {/* Icon Container */}
+      <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-md">
+        <img src={icon} alt={title} className="w-10 h-10" />
+      </div>
+      {/* Title */}
+      <h3 className="text-lg font-semibold text-[#2D336B] mb-2">{title}</h3>
+      {/* Company Name */}
+      <p className="text-lg font-semibold text-[#2D336B] mb-4">{companyName}</p>
+      {/* Open Button */}
+      <button className="flex items-center justify-center mx-auto text-black font-medium hover:underline">
+        Open
+        <img
+          src="/assets/rightArrow.png" // <-- replace with your arrow image
+          alt="arrow"
+          className="w-4 h-4 ml-1"
+        />
+      </button>
     </div>
   );
-};
-
+}
 export default JobCard;

@@ -60,17 +60,46 @@ export const postJob = async (req, res) => {
 };
 
 // Get all jobs (only published & valid ones for candidates)
+// src/controllers/jobController.js
+// src/controllers/jobController.js
 export const getJobs = async (req, res) => {
   try {
     const jobs = await Job.find({ isValid: true, isPublished: true })
       .populate("companyId", "companyName logo email")
       .sort({ postedDate: -1 });
-
-    // Don’t block frontend, just return empty list
-    return res.status(200).json(jobs);
+    console.log(`Fetched jobs at ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}:`, jobs);
+    return res.status(200).json(jobs || []);
   } catch (error) {
     console.error("Error fetching jobs:", error);
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// Get job by ID
+// src/controllers/jobController.js
+// controllers/jobController.js
+
+
+export const getJobById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log("Requested ID:", id); // Debug incoming ID
+
+    // Populate all needed company fields
+    const job = await Job.findById(id).populate(
+      "companyId",
+      "companyName logo description culture careerGrowth email"
+    );
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found." });
+    }
+
+    res.status(200).json(job);
+  } catch (err) {
+    console.error("Error fetching job:", err);
+    res.status(500).json({ message: "Failed to fetch job details." });
   }
 };
 

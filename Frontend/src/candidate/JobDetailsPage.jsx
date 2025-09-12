@@ -1,123 +1,151 @@
-// JobDetailsPage.jsx
+// src/candidate/JobDetailsPage.jsx
+import React, { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import Navbar from "@/components/home/Navbar";
 import Footer from "@/components/home/Footer";
-import Navbar from "../components/home/Navbar";
-import React from "react";
 
 const JobDetailsPage = () => {
+  const { id } = useParams();
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const [job, setJob] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/job/getjob/${id}`, {
+          withCredentials: true,
+        });
+        setJob(response.data);
+      } catch (err) {
+        setError(
+          err.response?.status === 404
+            ? "Job not found."
+            : "Failed to load job details. Please try again later."
+        );
+      }
+    };
+    fetchJob();
+  }, [id]);
+
+  const handleApply = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You must log in to apply.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/application/apply",
+        { jobId: id, companyId: state?.companyId || job?.companyId?._id },
+        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      );
+      alert(res.data.message);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to apply. Please try again.");
+    }
+  };
+
+  if (error) return <p className="p-6 text-red-600">{error}</p>;
+  if (!job) return <p className="p-6">Loading...</p>;
+
+  const displayField = (field) => (field ? field : "N/A");
+  const formatDate = (dateStr) => (dateStr ? new Date(dateStr).toLocaleDateString() : "N/A");
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        {/* Job Card */}
-        <div className="bg-white p-6 rounded-xl shadow-md mb-6">
-          <div className="flex justify-between items-start">
+      <div className="max-w-4xl mx-auto py-10 px-4">
+        {/* Job Header */}
+        <div className="bg-white shadow rounded-xl p-6 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h2 className="text-2xl font-semibold">Data Analyst</h2>
-              <p className="text-gray-600 text-base">Hitachi</p>
-              <p className="text-gray-500 mt-2 text-sm">
-                Domain: Technology | Experience: Fresher | Work Type: Hybrid | Salary: Not Disclosed
+              <h2 className="text-2xl font-bold text-gray-900">{displayField(job.jobPosition)}</h2>
+              <p className="text-gray-600 text-base mt-1">
+                {job.companyId?.companyName || "Unknown Company"}
               </p>
-              <p className="text-gray-500 mt-1 text-sm">
-                Location: Mumbai, Pune, Bangalore
+              <p className="text-gray-500 text-sm mt-2">
+                Domain: {displayField(job.domain)} | Experience: {displayField(job.experienceRequired)} | 
+                Work Type: {displayField(job.workType)} | Salary:{" "}
+                {job.salaryBudget ? `₹${job.salaryBudget.toLocaleString()}` : "N/A"}
               </p>
+              <p className="text-gray-500 text-sm">Location: {displayField(job.location)}</p>
+              <div className="flex space-x-6 text-gray-500 text-sm mt-2">
+                <span>Posted: {formatDate(job.postedDate)}</span>
+                <span>Openings: {displayField(job.openings)}</span>
+              </div>
             </div>
-            {/* Company Logo */}
-            <div className="w-20 h-20 bg-gray-300 rounded-md shadow-sm"></div>
-          </div>
 
-          <div className="flex justify-between mt-4 text-gray-500 text-sm">
-            <span>Posted: 5 days ago</span>
-            <span>Openings: 20</span>
+            <div className="flex flex-col items-center mt-4 md:mt-0">
+              {job.companyId?.logo ? (
+                <img
+                  src={job.companyId.logo}
+                  alt="Company Logo"
+                  className="h-20 w-20 object-contain rounded-md shadow"
+                />
+              ) : (
+                <div className="h-20 w-20 bg-gray-200 flex items-center justify-center rounded-md">
+                  <span className="text-gray-500 text-xs">Logo</span>
+                </div>
+              )}
+              <button
+                onClick={handleApply}
+                className="mt-4 bg-indigo-500 text-white px-5 py-2 rounded-md shadow hover:bg-indigo-600 transition"
+              >
+                Apply
+              </button>
+            </div>
           </div>
-          <br></br>
-          <hr class="border border-gray-400 my-6" />
-
-          <div className="mt-4 flex justify-end">
-            <button className="px-5 py-1.5 bg-blue-600 text-white rounded-md shadow text-sm font-medium">
-              Applied
-            </button>
-          </div>
-        </div>
-
-        {/* Application Status */}
-        <div className="bg-white p-5 rounded-xl shadow-md mb-6">
-          <h3 className="font-semibold text-2xl">
-            Application Status : <span className="text-green-600">Approved</span>
-          </h3>
         </div>
 
         {/* Job Description */}
-        <div className="bg-white p-6 rounded-xl shadow-md mb-6">
-          <h3 className="font-semibold text-xl mb-4">Job Description</h3>
-
-          <div className="mb-4">
-            <h4 className="font-semibold text-lg">Job Roles & Responsibilities:</h4>
-
-            <div className="mt-3">
-              <p className="font-medium">1. Business Intelligence:</p>
-              <ul className="list-disc list-inside mt-2 space-y-1 text-gray-700 text-sm">
-                <li>Develop, maintain, and enhance dashboards and reports using tools such as Power BI, Tableau, or Looker.</li>
-                <li>Collaborate with business stakeholders to gather requirements and translate them into meaningful visualizations.</li>
-                <li>Analyze datasets to provide actionable insights and support business decisions.</li>
-                <li>Monitor report performance and data accuracy.</li>
-              </ul>
-            </div>
-
-            <div className="mt-4">
-              <p className="font-medium">2. Data Engineering:</p>
-              <ul className="list-disc list-inside mt-2 space-y-1 text-gray-700 text-sm">
-                <li>Assist in building and maintaining ETL/ELT data pipelines using tools such as SQL, Python, ADF, and Snowflake.</li>
-                <li>Clean, transform, and load data from multiple sources into data warehouses ADLS and Snowflake.</li>
-                <li>Support data modeling efforts (e.g., star/snowflake schema) to improve reporting efficiency.</li>
-                <li>Document data sources, definitions, and processes.</li>
-                <li>Stay informed about the latest technology trends within the industry.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <h4 className="font-semibold text-lg">Skills:</h4>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-gray-700 text-sm">
-              <li>Strong SQL skills and familiarity with relational databases.</li>
-              <li>Basic experience in one or more BI tools (e.g., Power BI, Tableau).</li>
-              <li>Familiarity with scripting languages like Python or R.</li>
-              <li>Understanding of data warehousing concepts and ETL processes.</li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-lg">Key Qualities:</h4>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-gray-700 text-sm">
-              <li>Strong SQL skills and familiarity with relational databases.</li>
-              <li>Basic experience in one or more BI tools (e.g., Power BI, Tableau).</li>
-              <li>Familiarity with scripting languages like Python or R.</li>
-              <li>Understanding of data warehousing concepts and ETL processes.</li>
-            </ul>
-          </div>
+        <div className="bg-white shadow rounded-xl p-6 mb-8">
+          <h3 className="text-xl font-semibold mb-4">Job Description</h3>
+          <p className="text-gray-700 text-sm whitespace-pre-line">{displayField(job.jobDescription)}</p>
         </div>
 
-        {/* Company Description */}
-        <div className="bg-white p-6 rounded-xl shadow-md mb-6">
-          <h3 className="font-semibold text-xl mb-4">Company Description</h3>
-          <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-            Since its founding in 1910, Hitachi has responded to the expectations of society and its customers through technology and innovation...
-          </p>
+        {/* Skills */}
+        {job.skills?.length > 0 && (
+          <div className="bg-white shadow rounded-xl p-6 mb-8">
+            <h3 className="text-xl font-semibold mb-4">Skills</h3>
+            <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
+              {job.skills.map((skill, idx) => (
+                <li key={idx}>{skill}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-          <h4 className="font-semibold text-lg mb-2">Career Growth and Development</h4>
-          <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-            Hitachi places a strong emphasis on continuous learning and professional growth for its employees...
-          </p>
+        {/* Key Qualities */}
+        {job.keyQualities?.length > 0 && (
+          <div className="bg-white shadow rounded-xl p-6 mb-8">
+            <h3 className="text-xl font-semibold mb-4">Key Qualities</h3>
+            <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
+              {job.keyQualities.map((quality, idx) => (
+                <li key={idx}>{quality}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-          <h4 className="font-semibold text-lg mb-2">Work Culture</h4>
-          <p className="text-gray-700 text-sm leading-relaxed">
-            Hitachi is known for its collaborative and inclusive work culture that values innovation, teamwork, and respect for diversity...
-          </p>
+        {/* Company Info */}
+        <div className="bg-white shadow rounded-xl p-6 mb-8">
+          <h3 className="text-xl font-semibold mb-4">Company Description</h3>
+          <p className="text-gray-700 text-sm mb-2">{displayField(job.companyId?.description)}</p>
+
+          <h4 className="font-semibold text-lg mt-4">Career Growth and Development</h4>
+          <p className="text-gray-700 text-sm mb-2">{displayField(job.companyId?.careerGrowth)}</p>
+
+          <h4 className="font-semibold text-lg mt-4">Work Culture</h4>
+          <p className="text-gray-700 text-sm">{displayField(job.companyId?.culture)}</p>
         </div>
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

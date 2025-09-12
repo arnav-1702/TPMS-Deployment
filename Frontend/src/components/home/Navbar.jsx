@@ -31,7 +31,7 @@ const Navbar = () => {
         {/* Candidate (logged in OR not) */}
         {(!role || role === "candidate") && (
           <>
-            <Link to="/jobcards" className="text-[#2D336B] hover:text-blue-600">
+            <Link to="/findajob" className="text-[#2D336B] hover:text-blue-600">
               Find a Job
             </Link>
             {!role && (
@@ -51,7 +51,7 @@ const Navbar = () => {
         {/* Company (only logged in) */}
         {role === "company" && (
           <>
-            <Link to="/post-job" className="text-[#2D336B] hover:text-blue-600">
+            <Link to="/postjob" className="text-[#2D336B] hover:text-blue-600">
               Post a Job
             </Link>
             <Link
