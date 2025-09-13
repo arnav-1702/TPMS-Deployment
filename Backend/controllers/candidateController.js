@@ -345,3 +345,39 @@ export const getCandidateNotifications = async (req, res) => {
       .json({ message: "Error fetching notifications", error: error.message });
   }
 };
+
+// Get all applied jobs for a candidate
+export const getAppliedJobs = async (req, res) => {
+  try {
+    const candidateId = req.user.id;
+
+    const candidate = await Candidate.findById(candidateId).populate({
+  path: "applications.jobId", // populate job details
+  select: `
+    companyName companyLogo jobPosition domain experienceRequired workType salaryBudget 
+    location isPublished jobDescription skills keyQualities postedDate openings companyId
+  `,
+  populate: {
+    path: "companyId",
+    select: "companyName description careerGrowth culture", // include company details
+  },
+});
+
+
+    if (!candidate) {
+      return res.status(404).json({ message: "Candidate not found" });
+    }
+
+    // Filter out unpublished jobs if needed
+    const appliedJobs = candidate.applications
+      .filter(app => app.jobId && app.jobId.isPublished) 
+      .map(app => ({
+        job: app.jobId,
+        status: app.status,
+      }));
+
+    res.status(200).json({ appliedJobs });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

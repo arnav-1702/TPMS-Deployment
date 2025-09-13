@@ -20,6 +20,8 @@ import { PostJob } from './company/PostJob';
 import FindJob from './candidate/FindJob';
 
 import ProtectedRoute from '../Authentication/ProtectedRoute';
+import AppliedJobs from './candidate/AppliedJobs/AppliedJobs';
+import AppliedJobDetails from './candidate/AppliedJobs/AppliedJobDetails';
 
 function App() {
   return (
@@ -76,6 +78,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+           <Route
+            path="/appliedjobs"
+            element={
+              <ProtectedRoute allowedRoles={["candidate"]}>
+                <AppliedJobs />
+              </ProtectedRoute>
+            }
+          />
+          
+  <Route path="/applied-job/:id" element={<AppliedJobDetails />} />
+
         </Routes>
       </div>
     </div>

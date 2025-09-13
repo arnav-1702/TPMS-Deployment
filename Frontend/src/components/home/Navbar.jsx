@@ -132,7 +132,7 @@ const Navbar = () => {
                       <>
                         <li>
                           <Link
-                            to="/applied-jobs"
+                            to="/appliedjobs"
                             className="block px-4 py-3 hover:bg-gray-100"
                           >
                             Applied Jobs
