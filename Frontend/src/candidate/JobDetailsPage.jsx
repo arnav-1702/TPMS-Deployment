@@ -31,30 +31,51 @@ const JobDetailsPage = () => {
   }, [id]);
 
   const handleApply = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("You must log in to apply.");
-      navigate("/login");
-      return;
-    }
+  const token = localStorage.getItem("token");
+  const candidateId = localStorage.getItem("candidateId"); // ✅ get candidate ID
 
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/application/apply",
-        { jobId: id, companyId: state?.companyId || job?.companyId?._id },
-        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
-      );
-      alert(res.data.message);
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to apply. Please try again.");
-    }
-  };
+  if (!token || !candidateId) {
+    alert("You must log in to apply.");
+    navigate("/login");
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      "http://localhost:8000/candidate/apply",
+      { 
+        jobId: id, 
+        candidateId, 
+        companyId: state?.companyId || job?.companyId?._id 
+      },
+      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+    );
+
+    alert(res.data.message);
+    console.log("Candidate after applying:", res.data.candidate);
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed to apply. Please try again.");
+  }
+};
 
   if (error) return <p className="p-6 text-red-600">{error}</p>;
   if (!job) return <p className="p-6">Loading...</p>;
 
   const displayField = (field) => (field ? field : "N/A");
   const formatDate = (dateStr) => (dateStr ? new Date(dateStr).toLocaleDateString() : "N/A");
+
+  // Ensure skills and keyQualities are arrays
+  const skillsArray = Array.isArray(job.skills)
+    ? job.skills
+    : typeof job.skills === "string"
+    ? job.skills.split(",").map((s) => s.trim())
+    : [];
+
+  const keyQualitiesArray = Array.isArray(job.keyQualities)
+    ? job.keyQualities
+    : typeof job.keyQualities === "string"
+    ? job.keyQualities.split(",").map((q) => q.trim())
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,7 +88,7 @@ const JobDetailsPage = () => {
             <div>
               <h2 className="text-2xl font-bold text-gray-900">{displayField(job.jobPosition)}</h2>
               <p className="text-gray-600 text-base mt-1">
-                {job.companyId?.companyName || "Unknown Company"}
+                {job.companyId?.companyName || displayField(job.companyName)}
               </p>
               <p className="text-gray-500 text-sm mt-2">
                 Domain: {displayField(job.domain)} | Experience: {displayField(job.experienceRequired)} | 
@@ -81,10 +102,11 @@ const JobDetailsPage = () => {
               </div>
             </div>
 
+            {/* Company Logo & Apply Button */}
             <div className="flex flex-col items-center mt-4 md:mt-0">
-              {job.companyId?.logo ? (
+              {job.companyLogo ? (
                 <img
-                  src={job.companyId.logo}
+                  src={job.companyLogo} // Use the top-level companyLogo from job object
                   alt="Company Logo"
                   className="h-20 w-20 object-contain rounded-md shadow"
                 />
@@ -110,11 +132,11 @@ const JobDetailsPage = () => {
         </div>
 
         {/* Skills */}
-        {job.skills?.length > 0 && (
+        {skillsArray.length > 0 && (
           <div className="bg-white shadow rounded-xl p-6 mb-8">
             <h3 className="text-xl font-semibold mb-4">Skills</h3>
             <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-              {job.skills.map((skill, idx) => (
+              {skillsArray.map((skill, idx) => (
                 <li key={idx}>{skill}</li>
               ))}
             </ul>
@@ -122,11 +144,11 @@ const JobDetailsPage = () => {
         )}
 
         {/* Key Qualities */}
-        {job.keyQualities?.length > 0 && (
+        {keyQualitiesArray.length > 0 && (
           <div className="bg-white shadow rounded-xl p-6 mb-8">
             <h3 className="text-xl font-semibold mb-4">Key Qualities</h3>
             <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-              {job.keyQualities.map((quality, idx) => (
+              {keyQualitiesArray.map((quality, idx) => (
                 <li key={idx}>{quality}</li>
               ))}
             </ul>

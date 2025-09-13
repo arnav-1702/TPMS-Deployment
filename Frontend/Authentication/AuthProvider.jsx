@@ -1,68 +1,35 @@
-// src/Authentication/AuthProvider.jsx
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
-import { logoutCandidateAPI, logoutCompanyAPI } from "@/services/api";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [role, setRole] = useState(null);   
-  const [user, setUser] = useState(null);   
-  const [loading, setLoading] = useState(true); // prevent flicker while checking
+  const [role, setRole] = useState(null);
+  const [user, setUser] = useState(null);
 
-  // Run on app start
+  // Load role + user from localStorage on refresh
   useEffect(() => {
-  const checkSession = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/api/auth/me", {
-        withCredentials: true,
-      });
-      setRole(res.data.role);
-      setUser(res.data.user);
+    const savedRole = localStorage.getItem("role");
+    const savedUser = localStorage.getItem("user");
 
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-    } catch (err) {
-      // ❌ Ignore 404 errors silently
-      if (err.response?.status !== 404) {
-        console.error("Auth check failed:", err.message);
-      }
-      // ❌ Still clear auth state if cookie invalid
-      setRole(null);
-      setUser(null);
-      localStorage.removeItem("role");
-      localStorage.removeItem("user");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  checkSession();
-}, []);
+    if (savedRole) setRole(savedRole);
+    if (savedUser) setUser(JSON.parse(savedUser));
+  }, []);
 
   const login = (role, userData) => {
     setRole(role);
     setUser(userData);
+
+    // Save in localStorage
     localStorage.setItem("role", role);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const logout = async () => {
-    try {
-      if (role === "candidate") await logoutCandidateAPI();
-      if (role === "company") await logoutCompanyAPI();
-    } catch (err) {
-      console.error("Backend logout failed (probably no cookie):", err.message);
-    }
-
-    // clear state + storage
+  const logout = () => {
     setRole(null);
     setUser(null);
     localStorage.removeItem("role");
     localStorage.removeItem("user");
   };
-
-  if (loading) return <div>Loading...</div>; // show spinner/splash screen
 
   return (
     <AuthContext.Provider value={{ role, user, login, logout }}>

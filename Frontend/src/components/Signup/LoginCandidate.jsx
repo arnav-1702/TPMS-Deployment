@@ -22,6 +22,8 @@ export const LoginCandidate = () => {
       localStorage.setItem("candidate", JSON.stringify(res.data.candidate));
 
       alert("Login successful!");
+      localStorage.setItem("token", res.data.token);
+  localStorage.setItem("candidateId", res.data.candidate._id);
       login("candidate", res.data.candidate);
       navigate("/"); // redirect to homepage or candidate dashboard
     } catch (err) {

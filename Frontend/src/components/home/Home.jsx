@@ -3,8 +3,9 @@ import React from 'react'
 import Page1 from './page1.jsx'
 import Page2 from './page2.jsx'
 import Footer from './Footer.jsx'
-import Navbar from './Navbar.jsx'
+
 import Page3 from './Page3.jsx'
+import Navbar from "@/components/home/Navbar";
 
 
 export const Home = () => {

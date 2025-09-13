@@ -23,6 +23,7 @@ export const LoginCompany = () => {
       localStorage.setItem("company", JSON.stringify(res.data.company));
 
       alert("Login successful!");
+      
       login("company", res.data.company)
       navigate("/"); // or navigate("/company-dashboard") if you have one
     } catch (err) {

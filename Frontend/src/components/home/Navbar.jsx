@@ -10,10 +10,23 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await logout(); // now logout handles API + cleanup
+ const handleLogout = async () => {
+  try {
+    if (role === "company") {
+      await logoutCompanyAPI(); // your API call to /logout
+    } else if (role === "candidate") {
+      await logoutCandidateAPI(); // API call to /logout for candidates
+    }
+
+    logout(); // clear AuthContext state
+    alert("You have been logged out successfully!");
     navigate("/");
-  };
+  } catch (error) {
+    console.error("Logout failed:", error);
+    alert("Failed to log out. Please try again.");
+  }
+};
+
 
   return (
     <header className="w-full flex items-center justify-between px-6 sm:px-10 lg:px-16 py-4 shadow-sm bg-white">
@@ -197,5 +210,6 @@ const Navbar = () => {
     </header>
   );
 };
+
 
 export default Navbar;

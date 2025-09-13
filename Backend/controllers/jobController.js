@@ -1,105 +1,120 @@
 import Job from "../models/jobModel.js";
-import Company from "../models/companyModel.js";
+import { uploadToCloudinary } from "../middleware/multer.js";
 
+// POST a new job
 export const postJob = async (req, res) => {
   try {
     const {
       companyId,
-      jobPosition,
+      companyName,
       domain,
+      jobPosition,
       experienceRequired,
-      workType,
-      salaryBudget,
-      location,
-      openings,
       jobDescription,
+      salaryBudget,
+      workType,
       skills,
-      keyQualities,
+      location,
+      noticePeriodRequired,
+      openings,
+      urgencyStatus,
+      concernedPerson,
+      email,
+      phoneNumber,
+      competitiveCompanies,
+      keyQualities
     } = req.body;
 
-    // 1. Check if required fields are present
-    if (!companyId || !jobPosition || !location) {
-      return res.status(400).json({ message: "companyId, jobPosition, and location are required" });
+    if (!companyId || !jobPosition) {
+      return res.status(400).json({ message: "Company ID and job position are required" });
     }
 
-    // 2. Verify company exists and is approved
-    const company = await Company.findById(companyId);
-    if (!company) {
-      return res.status(404).json({ message: "Company not found" });
-    }
-    if (!company.isApproved) {
-      return res.status(403).json({ message: "Company is not approved to post jobs" });
+    // Upload company logo to Cloudinary
+    let companyLogo = "";
+    if (req.file) {
+      companyLogo = await uploadToCloudinary(req.file.buffer);
     }
 
-    // 3. Create job
+    // Create job
     const job = new Job({
       companyId,
-      jobPosition: jobPosition.trim(),
-      domain: domain?.trim(),
+      companyName,
+      domain,
+      jobPosition,
       experienceRequired,
-      workType,
+      jobDescription,
       salaryBudget,
-      location: location.trim(),
+      workType,
+      skills: skills ? skills.split(",").map(s => s.trim()) : [],
+      location,
+      noticePeriodRequired,
       openings: openings || 1,
-      jobDescription: jobDescription?.trim(),
-      skills: skills || [],
-      keyQualities: keyQualities || [],
+      urgencyStatus,
+      concernedPerson,
+      email,
+      phoneNumber,
+      competitiveCompanies,
+      keyQualities,
+      companyLogo,
+      isPublished: true
     });
 
-    // 4. Save job
-    await job.save();
+    const createdJob = await job.save();
 
-    res.status(201).json({
-      message: "Job posted successfully (awaiting admin validation)",
-      job,
-    });
+    // Populate companyId name
+    const populatedJob = await Job.findById(createdJob._id)
+      .populate("companyId", "companyName")
+      .select("-__v");
+
+    res.status(201).json(populatedJob);
   } catch (error) {
     console.error("Error posting job:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: error.message || "Server error" });
   }
 };
 
-// Get all jobs (only published & valid ones for candidates)
-// src/controllers/jobController.js
-// src/controllers/jobController.js
+// GET all jobs
 export const getJobs = async (req, res) => {
   try {
     const jobs = await Job.find({ isValid: true, isPublished: true })
-      .populate("companyId", "companyName logo email")
+      .populate("companyId", "companyName email") // only basic fields from company
       .sort({ postedDate: -1 });
-    console.log(`Fetched jobs at ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}:`, jobs);
-    return res.status(200).json(jobs || []);
+
+    // Map jobs to include logo at top level
+    const jobsWithLogo = jobs.map(job => ({
+      ...job.toObject(),
+      companyLogo: job.companyLogo, // top-level logo field
+    }));
+
+    res.status(200).json(jobsWithLogo);
   } catch (error) {
     console.error("Error fetching jobs:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Get job by ID
-// src/controllers/jobController.js
-// controllers/jobController.js
 
-
+// GET job by ID
 export const getJobById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log("Requested ID:", id); // Debug incoming ID
-
-    // Populate all needed company fields
     const job = await Job.findById(id).populate(
       "companyId",
-      "companyName logo description culture careerGrowth email"
+      "companyName description culture careerGrowth email"
     );
 
-    if (!job) {
-      return res.status(404).json({ message: "Job not found." });
-    }
+    if (!job) return res.status(404).json({ message: "Job not found." });
 
-    res.status(200).json(job);
-  } catch (err) {
-    console.error("Error fetching job:", err);
+    // Add companyLogo from job directly
+    const jobWithLogo = {
+      ...job.toObject(),
+      companyLogo: job.companyLogo, // <-- Important
+    };
+
+    res.status(200).json(jobWithLogo);
+  } catch (error) {
+    console.error("Error fetching job:", error);
     res.status(500).json({ message: "Failed to fetch job details." });
   }
 };
-

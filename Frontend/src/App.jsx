@@ -1,8 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-
-
 import SuperAdminLogin from './superAdmin.jsx/SuperAdminLogin';
 import SuperAdminDashboard from './superAdmin.jsx/SuperAdminDashboard';
 import { SignUpCandidate } from './components/Signup/SignUpCandidate';
@@ -21,32 +19,65 @@ import JobCard from './candidate/JobCard';
 import { PostJob } from './company/PostJob';
 import FindJob from './candidate/FindJob';
 
+import ProtectedRoute from '../Authentication/ProtectedRoute';
 
 function App() {
   return (
     <div className="min-h-screen flex flex-col">
-      
       <div className="flex-grow">
         <Routes>
-          <Route path="/" element={<Home/>} />
-          <Route path="/superadminlogin" element={<SuperAdminLogin/>} />
-          <Route path="/superadmindashboard" element={<SuperAdminDashboard/>} />
-          <Route path="/signupcandidate" element={<SignUpCandidate/>} />
-          <Route path="/logincandidate" element={<LoginCandidate/>} />
-          <Route path="/signupcompany" element={<SignUpCompany/>} />
-          <Route path="/logincompany" element={<LoginCompany/>} />
+          <Route path="/" element={<Home />} />
+          <Route path="/superadminlogin" element={<SuperAdminLogin />} />
+
+          {/* 🔐 Protected superadmin route */}
+          <Route
+            path="/superadmindashboard"
+            element={
+              <ProtectedRoute allowedRoles={["superadmin"]}>
+                <SuperAdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/signupcandidate" element={<SignUpCandidate />} />
+          <Route path="/logincandidate" element={<LoginCandidate />} />
+          <Route path="/signupcompany" element={<SignUpCompany />} />
+          <Route path="/logincompany" element={<LoginCompany />} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
-          <Route path="/companyid/jobid/jobdetails" element={<JobDetailsPage />} />
           <Route path="/commonsignup" element={<CommonSignup />} />
           <Route path="/commonlogin" element={<CommonLogin />} />
           <Route path="/verify-company-otp" element={<VerifyCompanyOtp />} />
           <Route path="/company-pending" element={<CompanyPendingApproval />} />
-          <Route path="/findajob" element={<FindJob/>} />
-          <Route path="/postjob" element={<PostJob/>} />
-          <Route path="/job-detail/:id" element={<JobDetailsPage/>} />
+
+          {/* 🔐 Candidate only */}
+          <Route
+            path="/findajob"
+            element={
+              <ProtectedRoute allowedRoles={["candidate"]}>
+                <FindJob />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/job-detail/:id"
+            element={
+              <ProtectedRoute allowedRoles={["candidate"]}>
+                <JobDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 🔐 Company only */}
+          <Route
+            path="/postjob"
+            element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <PostJob />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
-      
     </div>
   );
 }

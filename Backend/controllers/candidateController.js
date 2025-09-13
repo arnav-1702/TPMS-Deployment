@@ -217,8 +217,8 @@ export const googleSignin = async (req, res) => {
 // Logout
 export const logoutCandidate = async (req, res) => {
   try {
-    res.clearCookie("token");
-    res.status(200).json({ message: "Logout successful" });
+   res.clearCookie("token", { httpOnly: true, sameSite: "lax" });
+  res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -299,11 +299,7 @@ export const applyJob = async (req, res) => {
     if (!job || !job.isPublished)
       return res.status(403).json({ message: "Invalid job or not published" });
 
-    if (!candidate.isProfileComplete) {
-      return res
-        .status(400)
-        .json({ message: "Please complete your profile before applying" });
-    }
+    // ✅ Removed isProfileComplete check
 
     const alreadyApplied = candidate.applications.some(
       (app) => app.jobId.toString() === jobId
@@ -329,6 +325,7 @@ export const applyJob = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 // ================= NOTIFICATIONS ================= //
 
