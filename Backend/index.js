@@ -8,6 +8,7 @@ import companyRoutes from "./routes/company.js";
 import jobRoutes from "./routes/job.js";
 import candidateRoutes from "./routes/candidate.js";
 import superAdminRoutes from './routes/superAdmin.js';
+import candidatesApplicationRoutes from './routes/applicationRoutes.js'
 import authRoutes from "./routes/auth.js";
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/company', companyRoutes);
 app.use('/job', jobRoutes);
 app.use('/candidate', candidateRoutes);
 app.use('/superadmin', superAdminRoutes);
+app.use('/candidateapplication', candidatesApplicationRoutes);
 
 //for frontend auth
 app.use("/api/auth", authRoutes);

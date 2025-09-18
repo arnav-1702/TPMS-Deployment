@@ -1,38 +1,27 @@
-// Backend (e.g., middleware/auth.js)
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const authMiddleware = (req, res, next) => {
-  const token = req.cookies?.token;
+  let token = null;
 
-  // Log for debugging
-  console.log(`Request path: ${req.path}, Token: ${token || "none"}`);
-
-  // Allow logout requests to proceed without a token
-  if (req.path === "/candidate/logout" || req.path === "/company/logout") {
-    return next();
+  // Priority: Authorization header, fallback: cookie
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies?.token) {
+    token = req.cookies.token;
   }
 
-  // Return 403 for missing token on other routes
   if (!token) {
-    console.log(`No token provided for path: ${req.path}`);
     return res.status(403).json({ message: "No token provided" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
-
-    // Role check for superadmin
-    if (decoded.role && decoded.role === "superadmin") {
-      return next();
-    }
-
-    return next();
+    next();
   } catch (error) {
-    console.log(`Token verification failed for path: ${req.path}, Error: ${error.message}`);
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };

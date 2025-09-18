@@ -11,6 +11,7 @@ const JobDetailsPage = () => {
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
   const [error, setError] = useState(null);
+  const [hasApplied, setHasApplied] = useState(false);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -19,6 +20,15 @@ const JobDetailsPage = () => {
           withCredentials: true,
         });
         setJob(response.data);
+
+        // ✅ check candidate applications from localStorage
+        const candidate = JSON.parse(localStorage.getItem("candidate"));
+        if (candidate && Array.isArray(candidate.applications)) {
+          const alreadyApplied = candidate.applications.some(
+            (app) => app.jobId === id
+          );
+          setHasApplied(alreadyApplied);
+        }
       } catch (err) {
         setError(
           err.response?.status === 404
@@ -30,41 +40,12 @@ const JobDetailsPage = () => {
     fetchJob();
   }, [id]);
 
-  const handleApply = async () => {
-  const token = localStorage.getItem("token");
-  const candidateId = localStorage.getItem("candidateId"); // ✅ get candidate ID
-
-  if (!token || !candidateId) {
-    alert("You must log in to apply.");
-    navigate("/login");
-    return;
-  }
-
-  try {
-    const res = await axios.post(
-      "http://localhost:8000/candidate/apply",
-      { 
-        jobId: id, 
-        candidateId, 
-        companyId: state?.companyId || job?.companyId?._id 
-      },
-      { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
-    );
-
-    alert(res.data.message);
-    console.log("Candidate after applying:", res.data.candidate);
-  } catch (err) {
-    alert(err.response?.data?.message || "Failed to apply. Please try again.");
-  }
-};
-
   if (error) return <p className="p-6 text-red-600">{error}</p>;
   if (!job) return <p className="p-6">Loading...</p>;
 
   const displayField = (field) => (field ? field : "N/A");
   const formatDate = (dateStr) => (dateStr ? new Date(dateStr).toLocaleDateString() : "N/A");
 
-  // Ensure skills and keyQualities are arrays
   const skillsArray = Array.isArray(job.skills)
     ? job.skills
     : typeof job.skills === "string"
@@ -106,7 +87,7 @@ const JobDetailsPage = () => {
             <div className="flex flex-col items-center mt-4 md:mt-0">
               {job.companyLogo ? (
                 <img
-                  src={job.companyLogo} // Use the top-level companyLogo from job object
+                  src={job.companyLogo}
                   alt="Company Logo"
                   className="h-20 w-20 object-contain rounded-md shadow"
                 />
@@ -115,12 +96,26 @@ const JobDetailsPage = () => {
                   <span className="text-gray-500 text-xs">Logo</span>
                 </div>
               )}
-              <button
-                onClick={handleApply}
-                className="mt-4 bg-indigo-500 text-white px-5 py-2 rounded-md shadow hover:bg-indigo-600 transition"
-              >
-                Apply
-              </button>
+
+              {hasApplied ? (
+                <button
+                  disabled
+                  className="mt-4 bg-gray-400 text-white px-5 py-2 rounded-md shadow cursor-not-allowed"
+                >
+                  Already Applied
+                </button>
+              ) : (
+                <button
+                  onClick={() =>
+                    navigate(`/job/${id}/apply`, {
+                      state: { companyId: job?.companyId?._id },
+                    })
+                  }
+                  className="mt-4 bg-indigo-500 text-white px-5 py-2 rounded-md shadow hover:bg-indigo-600 transition"
+                >
+                  Apply
+                </button>
+              )}
             </div>
           </div>
         </div>

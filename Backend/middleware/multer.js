@@ -15,6 +15,9 @@ cloudinary.config({
 // Use memory storage
 const storage = multer.memoryStorage();
 
+// 🔹 General uploader (so you can call upload.fields([...]))
+export const upload = multer({ storage });
+
 /**
  * Factory function to create multer instance
  * @param {string} type - "image" | "resume"
@@ -32,13 +35,14 @@ const makeUploader = (type) =>
           file.mimetype === "application/pdf" ||
           file.mimetype ===
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) cb(null, true);
+        )
+          cb(null, true);
         else cb(new Error("Only PDF or DOCX files are allowed"));
       } else cb(new Error("Invalid upload type"));
     },
   });
 
-export const uploadImage = makeUploader("image");   // For logos, avatars, etc.
+export const uploadImage = makeUploader("image");   // For photos/logos
 export const uploadResume = makeUploader("resume"); // For resumes
 
 // Cloudinary upload helper

@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import Notification from "../models/notificationModel.js";
-
+import Job from "../models/jobModel.js"; 
 dotenv.config();
 
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

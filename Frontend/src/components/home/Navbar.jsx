@@ -13,12 +13,18 @@ const Navbar = () => {
  const handleLogout = async () => {
   try {
     if (role === "company") {
-      await logoutCompanyAPI(); // your API call to /logout
+      await logoutCompanyAPI();
     } else if (role === "candidate") {
-      await logoutCandidateAPI(); // API call to /logout for candidates
+      await logoutCandidateAPI();
     }
 
+    // 🔑 Clear everything from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("candidateId");
+    localStorage.removeItem("role"); // ✅ in case you stored it
+
     logout(); // clear AuthContext state
+
     alert("You have been logged out successfully!");
     navigate("/");
   } catch (error) {
@@ -26,6 +32,7 @@ const Navbar = () => {
     alert("Failed to log out. Please try again.");
   }
 };
+
 
 
   return (
@@ -64,7 +71,7 @@ const Navbar = () => {
         {/* Company (only logged in) */}
         {role === "company" && (
           <>
-            <Link to="/postjob" className="text-[#2D336B] hover:text-blue-600">
+            <Link to="/postajob" className="text-[#2D336B] hover:text-blue-600">
               Post a Job
             </Link>
             <Link
@@ -166,7 +173,7 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to="/verifications"
+                            to="/jobverification"
                             className="block px-4 py-3 hover:bg-gray-100"
                           >
                             Job Verifications

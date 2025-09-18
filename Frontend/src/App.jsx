@@ -1,27 +1,31 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
-import SuperAdminLogin from './superAdmin.jsx/SuperAdminLogin';
-import SuperAdminDashboard from './superAdmin.jsx/SuperAdminDashboard';
-import { SignUpCandidate } from './components/Signup/SignUpCandidate';
-import { LoginCandidate } from './components/Signup/LoginCandidate';
-import { SignUpCompany } from './components/Signup/SignUpCompany';
-import { LoginCompany } from './components/Signup/LoginCompany';
-import { Home } from './components/home/Home.jsx';
-import { VerifyOtp } from './components/Signup/VerifyOtp.jsx';
-import JobDetailsPage from './candidate/JobDetailsPage';
-import { CommonSignup } from './components/Signup/CommonSignup';
-import { CommonLogin } from './components/Signup/CommonLogin';
-import { VerifyCompanyOtp } from './components/Signup/VerifyCompanyOtp';
-import { CompanyPendingApproval } from './components/Signup/CompanyPendingApproval';
-import JobCards from './candidate/JobCards';
-import JobCard from './candidate/JobCard';
-import { PostJob } from './company/PostJob';
-import FindJob from './candidate/FindJob';
+import SuperAdminLogin from "./superAdmin.jsx/SuperAdminLogin";
+import SuperAdminDashboard from "./superAdmin.jsx/SuperAdminDashboard";
+import { SignUpCandidate } from "./components/Signup/SignUpCandidate";
+import { LoginCandidate } from "./components/Signup/LoginCandidate";
+import { SignUpCompany } from "./components/Signup/SignUpCompany";
+import { LoginCompany } from "./components/Signup/LoginCompany";
+import { Home } from "./components/home/Home.jsx";
+import { VerifyOtp } from "./components/Signup/VerifyOtp.jsx";
+import JobDetailsPage from "./candidate/JobDetailsPage";
+import { CommonSignup } from "./components/Signup/CommonSignup";
+import { CommonLogin } from "./components/Signup/CommonLogin";
+import { VerifyCompanyOtp } from "./components/Signup/VerifyCompanyOtp";
+import { CompanyPendingApproval } from "./components/Signup/CompanyPendingApproval";
+import JobCards from "./candidate/JobCards";
+import JobCard from "./candidate/JobCard";
+import { PostJob } from "./company/PostJob";
+import FindJob from "./candidate/FindJob";
 
-import ProtectedRoute from '../Authentication/ProtectedRoute';
-import AppliedJobs from './candidate/AppliedJobs/AppliedJobs';
-import AppliedJobDetails from './candidate/AppliedJobs/AppliedJobDetails';
+import ProtectedRoute from "../Authentication/ProtectedRoute";
+import AppliedJobs from "./candidate/AppliedJobs/AppliedJobs";
+import AppliedJobDetails from "./candidate/AppliedJobs/AppliedJobDetails";
+import JobApplicationForm from "./candidate/JobApplicationForm";
+import JobDashboard from "./company/JobDashboard";
+import AdminLogin from "./Admin/adminLogin";
+import JobVerification from "./company/jobverification/JobVerification";
 
 function App() {
   return (
@@ -71,15 +75,22 @@ function App() {
 
           {/* 🔐 Company only */}
           <Route
-            path="/postjob"
+            path="/postjobform"
             element={
               <ProtectedRoute allowedRoles={["company"]}>
                 <PostJob />
               </ProtectedRoute>
             }
           />
-
-           <Route
+          <Route
+            path="/jobverification"
+            element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <JobVerification/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/appliedjobs"
             element={
               <ProtectedRoute allowedRoles={["candidate"]}>
@@ -87,9 +98,32 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
-  <Route path="/applied-job/:id" element={<AppliedJobDetails />} />
 
+          <Route path="/applied-job/:id" element={<AppliedJobDetails />} />
+          <Route
+            path="/job/:jobId/apply"
+            element={
+              <ProtectedRoute allowedRoles={["candidate"]}>
+                <JobApplicationForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/postajob"
+            element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <JobDashboard></JobDashboard>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/adminlogin"
+            element={
+              
+                <AdminLogin></AdminLogin>
+              
+            }
+          />
         </Routes>
       </div>
     </div>

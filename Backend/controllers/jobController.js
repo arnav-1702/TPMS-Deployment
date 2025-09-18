@@ -1,6 +1,8 @@
 import Job from "../models/jobModel.js";
 import { uploadToCloudinary } from "../middleware/multer.js";
-
+import JobApplication from "../models/JobApplicationSchema.js";
+import Candidate from "../models/candidateModel.js";
+// import Job from "../models/jobModel.js";
 // POST a new job
 export const postJob = async (req, res) => {
   try {
@@ -116,5 +118,56 @@ export const getJobById = async (req, res) => {
   } catch (error) {
     console.error("Error fetching job:", error);
     res.status(500).json({ message: "Failed to fetch job details." });
+  }
+};
+
+export const getAppliedJobs = async (req, res) => {
+  try {
+    const candidateId = req.user.id;
+
+    // Find candidate and populate jobId inside applications
+    const candidate = await Candidate.findById(candidateId)
+      .populate("applications.jobId", "jobPosition companyName companyLogo domain location workType salaryBudget postedDate")
+      .lean();
+
+    if (!candidate || candidate.applications.length === 0) {
+      return res.status(200).json({ message: "No applied jobs found", applications: [] });
+    }
+
+    // Sort applications by appliedDate (descending)
+    const sortedApplications = candidate.applications.sort(
+      (a, b) => new Date(b.appliedDate) - new Date(a.appliedDate)
+    );
+
+    res.status(200).json({
+      message: "Applied jobs fetched successfully",
+      applications: sortedApplications,
+    });
+  } catch (error) {
+    console.error("Error fetching applied jobs:", error);
+    res.status(500).json({
+      message: "Failed to fetch applied jobs",
+      error: error.message,
+    });
+  }
+};
+
+export const getVerificationJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({ isValid: false }).sort({ postedDate: -1 });
+    res.status(200).json({ success: true, jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// 📌 Verified & active jobs
+export const getActiveJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({ isValid: true, isPublished: true, active: true })
+      .sort({ postedDate: -1 });
+    res.status(200).json({ success: true, jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
