@@ -25,6 +25,8 @@ export const LoginCompany = () => {
       alert("Login successful!");
       
       login("company", res.data.company)
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("companyId", res.data.company._id);
       navigate("/"); // or navigate("/company-dashboard") if you have one
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

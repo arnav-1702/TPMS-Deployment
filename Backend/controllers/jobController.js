@@ -78,7 +78,7 @@ export const postJob = async (req, res) => {
 // GET all jobs
 export const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ isValid: true, isPublished: true })
+    const jobs = await Job.find({ isValid: true, isPublished: true, active: true }) // ✅ added isActive
       .populate("companyId", "companyName email") // only basic fields from company
       .sort({ postedDate: -1 });
 
@@ -94,6 +94,7 @@ export const getJobs = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 // GET job by ID
@@ -152,22 +153,80 @@ export const getAppliedJobs = async (req, res) => {
   }
 };
 
+// 📌 Jobs pending verification (only for the logged-in company)
+import mongoose from "mongoose";
+
 export const getVerificationJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ isValid: false }).sort({ postedDate: -1 });
+    if (!req.user || req.user.role !== "company") {
+      return res.status(403).json({ success: false, message: "Unauthorized access" });
+    }
+
+    // 🔑 Use req.user.id, convert to ObjectId
+    const companyId = new mongoose.Types.ObjectId(req.user.id);
+
+    const jobs = await Job.find({
+      companyId: companyId,
+      isValid: false
+    }).sort({ postedDate: -1 });
+
     res.status(200).json({ success: true, jobs });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// 📌 Verified & active jobs
 export const getActiveJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ isValid: true, isPublished: true, active: true })
-      .sort({ postedDate: -1 });
+    if (!req.user || req.user.role !== "company") {
+      return res.status(403).json({ success: false, message: "Unauthorized access" });
+    }
+
+    const companyId = new mongoose.Types.ObjectId(req.user.id);
+
+    const jobs = await Job.find({
+      companyId: companyId,
+      isValid: true,
+      isPublished: true,
+     
+    }).sort({ postedDate: -1 });
+
     res.status(200).json({ success: true, jobs });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+
+
+
+export const toggleActiveJob = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    job.active = !job.active;
+    await job.save();
+
+    res.status(200).json({ message: "Job status updated", job });
+  } catch (error) {
+    res.status(500).json({ message: "Error toggling job status", error });
+  }
+};
+
+
+export const deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndDelete(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    res.status(200).json({ message: "Job deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    res.status(500).json({ message: "Server error while deleting job", error });
   }
 };

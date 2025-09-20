@@ -7,53 +7,59 @@ export const applyForJob = async (req, res) => {
     const { jobId } = req.params;
     const candidateId = req.user.id;
 
-    // ✅ Check if candidate already applied for this job
-    const existingApplication = await JobApplication.findOne({
-      jobId,
-      candidateId,
-    });
-
-    if (existingApplication) {
-      return res.status(400).json({
-        message: "You have already applied for this job.",
-      });
-    }
-
+    // Upload files
     let photoUrl = null;
     let resumeUrl = null;
 
     if (req.files?.photo) {
-      const photoBuffer = req.files.photo[0].buffer;
-      photoUrl = await uploadToCloudinary(photoBuffer, "candidatePhotos");
+      photoUrl = await uploadToCloudinary(req.files.photo[0].buffer, "candidatePhotos");
     }
 
     if (req.files?.resume) {
-      const resumeBuffer = req.files.resume[0].buffer;
-      resumeUrl = await uploadToCloudinary(resumeBuffer, "candidateResumes");
+      resumeUrl = await uploadToCloudinary(req.files.resume[0].buffer, "candidateResumes");
     }
 
-    const application = new JobApplication({
-      jobId,
+    const candidateData = {
       candidateId,
       ...req.body,
       photo: photoUrl,
       resume: resumeUrl,
-    });
+    };
 
-    await application.save();
+    // Find existing job application document
+    let jobApplication = await JobApplication.findOne({ jobId });
 
+    if (!jobApplication) {
+      // Create a new document if it doesn't exist
+      jobApplication = new JobApplication({
+        jobId,
+        candidates: [candidateData],
+      });
+    } else {
+      // Check if candidate already applied
+      const alreadyApplied = jobApplication.candidates.some(
+        (c) => c.candidateId.toString() === candidateId
+      );
+
+      if (alreadyApplied) {
+        return res.status(400).json({ message: "You have already applied for this job." });
+      }
+
+      // Add candidate to existing job
+      jobApplication.candidates.push(candidateData);
+    }
+
+    await jobApplication.save();
+
+    // Optional: update candidate document with applied job info
     await Candidate.findByIdAndUpdate(candidateId, {
-      $push: { applications: { jobId, applicationId: application._id } },
+      $push: { applications: { jobId } },
     });
 
-    res.status(201).json({
-      message: "Application submitted successfully",
-      application,
-    });
+    res.status(201).json({ message: "Application submitted successfully", jobApplication });
+
   } catch (error) {
-    res.status(500).json({
-      message: "Error submitting application",
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: "Error submitting application", error: error.message });
   }
 };

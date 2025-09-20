@@ -30,6 +30,7 @@ const Navbar = () => {
   } catch (error) {
     console.error("Logout failed:", error);
     alert("Failed to log out. Please try again.");
+    navigate("/commonlogin");
   }
 };
 

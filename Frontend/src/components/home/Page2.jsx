@@ -103,11 +103,12 @@ const Page2 = () => {
             <p className="text-center text-gray-500">No jobs found.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {jobs.slice(0, 4).map((job, index) => (
+              {jobs.slice(0, 4).map((job) => (
                 <JobCard
-                  key={index}
+                  key={job._id}
+                  id={job._id}
                   title={job.jobPosition}
-                  companyName={job.companyName}
+                  companyName={job.companyId?.companyName || job.companyName}
                   logo={job.companyLogo}
                 />
               ))}

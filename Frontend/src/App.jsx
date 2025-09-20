@@ -26,6 +26,7 @@ import JobApplicationForm from "./candidate/JobApplicationForm";
 import JobDashboard from "./company/JobDashboard";
 import AdminLogin from "./Admin/adminLogin";
 import JobVerification from "./company/jobverification/JobVerification";
+import CompanyJobDetailsPage from "./company/jobverification/CompanyJobDetailsPage";
 
 function App() {
   return (
@@ -74,6 +75,14 @@ function App() {
           />
 
           {/* 🔐 Company only */}
+          <Route
+            path="/company/job/:id"
+            element={
+              <ProtectedRoute allowedRoles={["company"]}>
+                <CompanyJobDetailsPage></CompanyJobDetailsPage>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/postjobform"
             element={

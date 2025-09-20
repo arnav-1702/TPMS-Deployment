@@ -1,62 +1,65 @@
 import mongoose from "mongoose";
 
-const JobApplicationSchema = new mongoose.Schema(
-  {
-    jobId: { type: mongoose.Schema.Types.ObjectId, ref: "Job", required: true },
-    candidateId: { type: mongoose.Schema.Types.ObjectId, ref: "Candidate", required: true },
+const JobApplicationSchema = new mongoose.Schema({
+  jobId: { type: mongoose.Schema.Types.ObjectId, ref: "Job", required: true },
 
-    // Personal Info
-    age: Number,
-    cityOfResidence: String,
-    homeTown: String,
-    yearsOfExperience: Number,
-    email: String,
-    contactNumber: String,
+  candidates: [
+    {
+      candidateId: { type: mongoose.Schema.Types.ObjectId, ref: "Candidate", required: true },
 
-    // Education
-    tenthPercentage: Number,
-    twelfthPercentage: Number,
-    bachelorsDegree: String,
-    bachelorsCollege: String,
-    mastersDegree: String,
-    mastersCollege: String,
-    bachelorsCGPA: String,
-    mastersCGPA: String,
+      // Personal Info
+      age: Number,
+      cityOfResidence: String,
+      homeTown: String,
+      yearsOfExperience: Number,
+      email: String,
+      contactNumber: String,
 
-    // Work
-    companyName: String,
-    companyLocation: String,
-    jobPosition: String,
-    yearsInCompany: Number,
-    salaryCTCYearly: Number,
-    salaryCTCMonthly: Number,
-    salaryInhandYearly: Number,
-    salaryInhandMonthly: Number,
-    onNoticePeriod: String,
-    noticePeriodDuration: String,
+      // Education
+      tenthPercentage: Number,
+      twelfthPercentage: Number,
+      bachelorsDegree: String,
+      bachelorsCollege: String,
+      mastersDegree: String,
+      mastersCollege: String,
+      bachelorsCGPA: String,
+      mastersCGPA: String,
 
-    // Extras
-    skillsSummary: String,
-    reasonForJobChange: String,
-    panIndiaLocation: String,
-    preferredLocation: String,
+      // Work
+      companyName: String,
+      companyLocation: String,
+      jobPosition: String,
+      yearsInCompany: Number,
+      salaryCTCYearly: Number,
+      salaryCTCMonthly: Number,
+      salaryInhandYearly: Number,
+      salaryInhandMonthly: Number,
+      onNoticePeriod: String,
+      noticePeriodDuration: String,
 
-    // Expected Salary
-    expectedSalaryCTCYearly: Number,
-    expectedSalaryInhandMonthly: Number,
+      // Extras
+      skillsSummary: String,
+      reasonForJobChange: String,
+      panIndiaLocation: String,
+      preferredLocation: String,
 
-    // Files
-    photo: String,
-    resume: String,
+      // Expected Salary
+      expectedSalaryCTCYearly: Number,
+      expectedSalaryInhandMonthly: Number,
 
-    status: {
-      type: String,
-      enum: ["pending", "approved", "rejected"],
-      default: "pending",
-    },
-    reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
-  },
-  { timestamps: true }
-);
+      // Files
+      photo: String,
+      resume: String,
+
+      // Application status
+      status: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+        default: "pending",
+      },
+      reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
+    }
+  ]
+}, { timestamps: true });
 
 export default mongoose.model("JobApplication", JobApplicationSchema);

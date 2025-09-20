@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 import { OAuth2Client } from "google-auth-library";
-
+// import Job from "../models/jobModel.js";
 dotenv.config();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -347,30 +347,32 @@ export const getCandidateNotifications = async (req, res) => {
 };
 
 // Get all applied jobs for a candidate
+// Get all applied jobs for a candidate
+// Get all applied jobs for a candidate
 export const getAppliedJobs = async (req, res) => {
   try {
     const candidateId = req.user.id;
 
     const candidate = await Candidate.findById(candidateId).populate({
-  path: "applications.jobId", // populate job details
-  select: `
-    companyName companyLogo jobPosition domain experienceRequired workType salaryBudget 
-    location isPublished jobDescription skills keyQualities postedDate openings companyId
-  `,
-  populate: {
-    path: "companyId",
-    select: "companyName description careerGrowth culture", // include company details
-  },
-});
-
+      path: "applications.jobId", // populate job details
+      match: { active: true, isPublished: true, isValid: true }, // ✅ active + published + valid
+      select: `
+        companyName companyLogo jobPosition domain experienceRequired workType salaryBudget 
+        location isPublished isValid jobDescription skills keyQualities postedDate openings companyId
+      `,
+      populate: {
+        path: "companyId",
+        select: "companyName description careerGrowth culture", // include company details
+      },
+    });
 
     if (!candidate) {
       return res.status(404).json({ message: "Candidate not found" });
     }
 
-    // Filter out unpublished jobs if needed
+    // Filter out null jobs (inactive/unpublished/invalid removed by match)
     const appliedJobs = candidate.applications
-      .filter(app => app.jobId && app.jobId.isPublished) 
+      .filter(app => app.jobId !== null)
       .map(app => ({
         job: app.jobId,
         status: app.status,

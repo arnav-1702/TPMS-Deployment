@@ -1,7 +1,10 @@
 import React from "react";
 import { FiArrowRight } from "react-icons/fi"; // ⬅️ arrow icon
+import { useNavigate } from "react-router-dom";
 
-function JobCard({ title, companyName, logo }) {
+function JobCard({ id, title, companyName, logo }) {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white rounded-2xl p-6 text-center shadow-md hover:shadow-lg transition-all w-[85%] h-72 border border-gray-100">
       {/* Logo Container */}
@@ -20,7 +23,10 @@ function JobCard({ title, companyName, logo }) {
       <p className="text-base font-medium text-gray-600 mb-6">{companyName}</p>
 
       {/* Open Button */}
-      <button className="flex items-center justify-center mx-auto text-[#2D336B] font-semibold hover:text-indigo-600 transition-colors">
+      <button
+        onClick={() => navigate(`/job-detail/${id}`)}
+        className="flex items-center justify-center mx-auto text-[#2D336B] font-semibold hover:text-indigo-600 transition-colors"
+      >
         Open
         <FiArrowRight className="w-5 h-5 ml-2" />
       </button>

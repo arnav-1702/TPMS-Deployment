@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ArrowRight } from "lucide-react"; // ✅ added icon
 import Footer from "@/components/home/Footer";
 import Navbar from "@/components/home/Navbar";
 
@@ -12,26 +13,32 @@ const JobVerification = () => {
   const [verifiedJobs, setVerifiedJobs] = useState([]);
 
   // Fetch jobs from backend
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const [verificationRes, activeRes] = await Promise.all([
-          axios.get("http://localhost:8000/job/verification"),
-          axios.get("http://localhost:8000/job/active"),
-        ]);
+ useEffect(() => {
+  const fetchJobs = async () => {
+    try {
+      const token = localStorage.getItem("token"); // 🔑 get token
 
-        setVerificationRequests(verificationRes.data.jobs || []);
-        setVerifiedJobs(activeRes.data.jobs || []);
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      }
-    };
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
 
-    fetchJobs();
-  }, []);
+      const [verificationRes, activeRes] = await Promise.all([
+        axios.get("http://localhost:8000/job/verification", { headers }),
+        axios.get("http://localhost:8000/job/active", { headers }),
+      ]);
+
+      setVerificationRequests(verificationRes.data.jobs || []);
+      setVerifiedJobs(activeRes.data.jobs || []);
+    } catch (error) {
+      console.error("Error fetching jobs:", error.response?.data || error.message);
+    }
+  };
+
+  fetchJobs();
+}, []);
 
   const goToJobPortal = (job) => {
-    navigate("/job-portal", { state: { job } });
+    navigate(`/company/job/${job._id}`, { state: { job } });
   };
 
   return (
@@ -56,7 +63,11 @@ const JobVerification = () => {
                   >
                     <div className="flex-1 flex items-center justify-center">
                       <div className="w-20 h-20 bg-white rounded-[1.25rem] flex items-center justify-center">
-                        <img src={job.companyLogo || "/assets/4th.png"} alt="Job Icon" className="w-10 h-10" />
+                        <img
+                          src={job.companyLogo || "/assets/4th.png"}
+                          alt="Job Icon"
+                          className="w-10 h-10"
+                        />
                       </div>
                     </div>
 
@@ -66,7 +77,7 @@ const JobVerification = () => {
                       </h3>
                       <div className="text-[#2d336b] font-medium flex items-center gap-2">
                         Open
-                        <img src="/assets/rightArrow.png" alt="Right Arrow" className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4" /> {/* ✅ replaced image */}
                       </div>
                     </div>
                   </div>
@@ -91,7 +102,11 @@ const JobVerification = () => {
                   >
                     <div className="flex-1 flex items-center justify-center">
                       <div className="w-20 h-20 bg-white rounded-[1.25rem] flex items-center justify-center">
-                        <img src={job.companyLogo || "/assets/4th.png"} alt="Job Icon" className="w-10 h-10" />
+                        <img
+                          src={job.companyLogo || "/assets/4th.png"}
+                          alt="Job Icon"
+                          className="w-10 h-10"
+                        />
                       </div>
                     </div>
 
@@ -101,7 +116,7 @@ const JobVerification = () => {
                       </h3>
                       <div className="text-[#2d336b] font-medium flex items-center gap-2">
                         Open
-                        <img src="/assets/rightArrow.png" alt="Right Arrow" className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4" /> {/* ✅ replaced image */}
                       </div>
                     </div>
                   </div>
