@@ -190,7 +190,7 @@ const Navbar = () => {
                         </li>
                         <li>
                           <Link
-                            to="/shortlisted"
+                            to="/company/shortlistcandidate"
                             className="block px-4 py-3 hover:bg-gray-100"
                           >
                             Shortlisted Candidates

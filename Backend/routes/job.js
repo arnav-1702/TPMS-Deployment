@@ -17,5 +17,5 @@ router.get("/verification", authMiddleware, getVerificationJobs);
 router.get("/active", authMiddleware, getActiveJobs);
 
 router.put("/:id", authMiddleware, toggleActiveJob);
-router.delete("/:id", authMiddleware, deleteJob);
+router.delete("/delete/:id", authMiddleware, deleteJob);
 export default router;

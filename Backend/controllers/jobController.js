@@ -216,17 +216,28 @@ export const toggleActiveJob = async (req, res) => {
 };
 
 
+
+
 export const deleteJob = async (req, res) => {
   try {
-    const job = await Job.findByIdAndDelete(req.params.id);
+    const jobId = req.params.id;
 
+    // 1. Delete job
+    const job = await Job.findByIdAndDelete(jobId);
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
-    res.status(200).json({ message: "Job deleted successfully" });
+    // 2. Remove jobId from candidates' applications
+    await Candidate.updateMany(
+      { "applications.jobId": jobId },
+      { $pull: { applications: { jobId: jobId } } }
+    );
+
+    res.status(200).json({ message: "Job deleted successfully and removed from candidates" });
   } catch (error) {
     console.error("Error deleting job:", error);
     res.status(500).json({ message: "Server error while deleting job", error });
   }
 };
+

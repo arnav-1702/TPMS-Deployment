@@ -24,9 +24,12 @@ import AppliedJobs from "./candidate/AppliedJobs/AppliedJobs";
 import AppliedJobDetails from "./candidate/AppliedJobs/AppliedJobDetails";
 import JobApplicationForm from "./candidate/JobApplicationForm";
 import JobDashboard from "./company/JobDashboard";
-import AdminLogin from "./Admin/adminLogin";
+import AdminLogin from "./Admin/AdminLogin";
 import JobVerification from "./company/jobverification/JobVerification";
 import CompanyJobDetailsPage from "./company/jobverification/CompanyJobDetailsPage";
+import ShortlistedCandidates from "./company/shortlistedcandidates/ShortlistedCandidates";
+import AllCandidates from "./company/shortlistedcandidates/AllCandidates";
+import AdminDashboard from "./Admin/AdminDashboard";
 
 function App() {
   return (
@@ -131,6 +134,25 @@ function App() {
               
                 <AdminLogin></AdminLogin>
               
+            }
+          />
+
+          <Route
+            path="/company/shortlistcandidate"
+            element={
+              
+                <ShortlistedCandidates></ShortlistedCandidates>
+              
+            }
+          />
+          <Route path="/jobs/:jobId/candidates" element={<AllCandidates />} />
+          {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
             }
           />
         </Routes>

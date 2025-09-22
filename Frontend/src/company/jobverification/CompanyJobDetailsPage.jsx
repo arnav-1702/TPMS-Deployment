@@ -73,7 +73,7 @@ const CompanyJobDetailsPage = () => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
 
     try {
-      await axios.delete(`http://localhost:8000/job/${id}`, {
+      await axios.delete(`http://localhost:8000/job/delete/${id}`, {
         withCredentials: true,
       });
       alert("Job deleted successfully");
@@ -134,11 +134,11 @@ const CompanyJobDetailsPage = () => {
                 onClick={toggleActive}
                 className={`mt-4 px-5 py-2 rounded-md shadow transition ${
                   job.activeJob
-                    ? "bg-green-500 hover:bg-green-600 text-white"
-                    : "bg-gray-400 hover:bg-gray-500 text-white"
+                    ? "bg-gray-400 hover:bg-gray-500 text-white"
+                    :"bg-green-500 hover:bg-green-600 text-white"
                 }`}
               >
-                {job.activeJob ? "Active" : "Inactive"}
+                {job.activeJob ? "Inactive" : "Active"}
               </button>
 
               <button

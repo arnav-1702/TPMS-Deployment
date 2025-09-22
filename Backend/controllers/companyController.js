@@ -276,3 +276,35 @@ export const getCompanyNotifications = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const getPendingCompanies = async (req, res) => {
+  try {
+    const pendingCompanies = await Company.find({ isApproved: false });
+    res.status(200).json({
+      message: "Pending companies retrieved successfully",
+      totalPendingCompanies: pendingCompanies.length,
+      pendingCompanies,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error while fetching pending companies",
+      error: error.message,
+    });
+  }
+};
+
+export const getPendingJobs = async (req, res) => {
+  try {
+    const pendingJobs = await Job.find({ isValid: false });
+    res.status(200).json({
+      message: "Pending jobs retrieved successfully",
+      totalPendingJobs: pendingJobs.length,
+      pendingJobs,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error while fetching pending jobs",
+      error: error.message,
+    });
+  }
+};

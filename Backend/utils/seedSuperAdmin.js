@@ -7,22 +7,28 @@ dotenv.config({ path: '../.env' });
 
 const seedSuperAdmin = async () => {
   try {
-    console.log('MONGO_URL:', process.env.MONGO_URL); // Debug log to confirm env is loaded
-    await mongoose.connect(process.env.MONGO_URL);
+    console.log('MONGO_URL:', process.env.MONGO_URL);
 
-    const existingSuperAdmin = await SuperAdmin.findOne({ email: 'superadmin@xai.com' });
+    await mongoose.connect(process.env.MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    const email = process.env.SUPERADMIN_EMAIL;
+    const password = process.env.SUPERADMIN_PASSWORD;
+
+    // ✅ check by the same email
+    const existingSuperAdmin = await SuperAdmin.findOne({ email });
     if (existingSuperAdmin) {
       console.log('Super Admin already exists');
       process.exit(0);
     }
 
-    const hashedPassword = await bcrypt.hash('superadmin123', 10);
-    const superAdmin = {
-      email: 'superadmin@123.com',
-      password: hashedPassword
-    };
+    // ✅ hash password from env
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    await SuperAdmin.create(superAdmin);
+    await SuperAdmin.create({ email, password: hashedPassword });
+
     console.log('Super Admin seeded successfully');
     process.exit(0);
   } catch (error) {

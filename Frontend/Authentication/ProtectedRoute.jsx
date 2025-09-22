@@ -1,4 +1,3 @@
-// ProtectedRoute.jsx
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
@@ -6,17 +5,19 @@ import { AuthContext } from "./AuthProvider";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { role } = useContext(AuthContext);
 
-  // Check AuthContext first, then localStorage
-  const storedRole = localStorage.getItem("role");
+  // Fallback to localStorage if role is missing in context
+  let storedRole = localStorage.getItem("role");
+  if (!storedRole || storedRole === "undefined") storedRole = null;
+
   const effectiveRole = role || storedRole;
 
   if (!effectiveRole) {
-    // If no role in context or storage → redirect to home
+    // No role → redirect to login
     return <Navigate to="/commonlogin" replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(effectiveRole)) {
-    // If role exists but not in allowed list → deny access
+    // Role exists but is not allowed → redirect to home
     return <Navigate to="/" replace />;
   }
 

@@ -10,9 +10,15 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const savedRole = localStorage.getItem("role");
     const savedUser = localStorage.getItem("user");
+    const savedAdmin = localStorage.getItem("admin");
 
     if (savedRole) setRole(savedRole);
-    if (savedUser) setUser(JSON.parse(savedUser));
+
+    if (savedUser && savedUser !== "undefined") {
+      setUser(JSON.parse(savedUser));
+    } else if (savedAdmin && savedAdmin !== "undefined") {
+      setUser(JSON.parse(savedAdmin));
+    }
   }, []);
 
   const login = (role, userData) => {
@@ -21,7 +27,13 @@ export const AuthProvider = ({ children }) => {
 
     // Save in localStorage
     localStorage.setItem("role", role);
-    localStorage.setItem("user", JSON.stringify(userData));
+    if (userData) {
+      if (role === "admin" || role === "superadmin") {
+        localStorage.setItem("admin", JSON.stringify(userData));
+      } else {
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
+    }
   };
 
   const logout = () => {
@@ -29,6 +41,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("role");
     localStorage.removeItem("user");
+    localStorage.removeItem("admin");
   };
 
   return (

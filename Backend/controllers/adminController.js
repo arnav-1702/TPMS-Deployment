@@ -224,3 +224,98 @@ export const getAllJobs = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+export const getTotalCandidates = async (req, res) => {
+  try {
+    // Count all candidates in the database
+    const totalCandidates = await Candidate.countDocuments();
+
+    res.status(200).json({
+      message: "Total candidates retrieved successfully",
+      totalCandidates,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error while fetching total candidates",
+      error: error.message,
+    });
+  }
+};
+export const getTotalCompanies = async (req, res) => {
+  try {
+    // Count all candidates in the database
+    
+    const totalCompanies = await Company.countDocuments();
+
+    res.status(200).json({
+      message: "Total candidates retrieved successfully",
+      totalCompanies,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error while fetching total candidates",
+      error: error.message,
+    });
+  }
+};
+
+
+
+export const getMonthlyJobPostings = async (req, res) => {
+  try {
+    // Aggregate jobs by month
+    const jobsByMonth = await Job.aggregate([
+      {
+        $group: {
+          _id: { $month: "$signupDate" }, // or "$createdAt" if you have timestamps
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id": 1 } }, // Sort by month
+    ]);
+
+    // Transform to frontend-friendly format
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+
+    const chartData = months.map((month, idx) => {
+      const monthData = jobsByMonth.find((m) => m._id === idx + 1);
+      return { month, value: monthData ? monthData.count : 0 };
+    });
+
+    res.status(200).json({ message: "Monthly job postings retrieved", chartData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+export const getMonthlyJobApplications = async (req, res) => {
+  try {
+    // Fetch all candidates with their applications
+    const candidates = await Candidate.find({}, "applications");
+
+    // Initialize months
+    const months = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+    const chartData = months.map(month => ({ month, value: 0 }));
+
+    // Count applications per month
+    candidates.forEach(candidate => {
+      candidate.applications.forEach(app => {
+        const date = new Date(app.appliedAt || app.createdAt || Date.now());
+        const monthIndex = date.getMonth();
+        chartData[monthIndex].value += 1;
+      });
+    });
+
+    res.status(200).json({ chartData });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
