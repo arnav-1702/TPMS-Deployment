@@ -30,6 +30,10 @@ import CompanyJobDetailsPage from "./company/jobverification/CompanyJobDetailsPa
 import ShortlistedCandidates from "./company/shortlistedcandidates/ShortlistedCandidates";
 import AllCandidates from "./company/shortlistedcandidates/AllCandidates";
 import AdminDashboard from "./Admin/AdminDashboard";
+import ActiveJob from "./Admin/ActiveJobs/ActiveJob";
+import CompanyVerification from "./Admin/CompanyVerification/CompanyVerification";
+import CompanyVerificationDetails from "./Admin/CompanyVerification/CompanyVerificationDetails";
+import JobVerificationAdmin from "./Admin/JobVerification/JobVerificationAdmin";
 
 function App() {
   return (
@@ -155,7 +159,38 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/active-jobs"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <ActiveJob></ActiveJob>
+              </ProtectedRoute>
+            }
+          />
+          {/* /admin/active-jobs */}
+          
+           <Route
+            path="/admin/company-verification"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <CompanyVerification></CompanyVerification>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/company/:id" element={<CompanyVerificationDetails />} />
+          <Route
+            path="/job-verification"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <JobVerificationAdmin></JobVerificationAdmin>
+              </ProtectedRoute>
+            }
+          />
+          
+          
         </Routes>
+
+        
       </div>
     </div>
   );

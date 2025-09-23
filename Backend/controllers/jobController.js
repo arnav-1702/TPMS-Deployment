@@ -241,3 +241,38 @@ export const deleteJob = async (req, res) => {
   }
 };
 
+// job verification for admin
+export const getJobsForVerification = async (req, res) => {
+  try {
+    // Fetch jobs that are not yet approved/validated
+    const pendingJobs = await Job.find({ isValid: false });
+
+    res.status(200).json({
+      message: "Pending jobs retrieved successfully",
+      totalPendingJobs: pendingJobs.length,
+      pendingJobs,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error while fetching pending jobs",
+      error: error.message,
+    });
+  }
+};
+
+export const getVerifiedJobs = async (req, res) => {
+  try {
+    const verifiedJobs = await Job.find({ isValid: true });
+
+    res.status(200).json({
+      message: "Verified jobs retrieved successfully",
+      totalVerifiedJobs: verifiedJobs.length,
+      jobs: verifiedJobs,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error while fetching verified jobs",
+      error: error.message,
+    });
+  }
+};

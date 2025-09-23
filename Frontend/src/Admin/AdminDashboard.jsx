@@ -72,7 +72,7 @@ export default function AdminDashboard() {
     { label: "Home", path: "/admin/dashboard" },
     { label: "Active Jobs", path: "/admin/active-jobs" },
     { label: "Shortlist Applicants", path: "/shortlist-applicants" },
-    { label: "Company Verification", path: "/company-verification" },
+    { label: "Company Verification", path: "/admin/company-verification" },
     { label: "Job Verification", path: "/job-verification" },
     { label: "Logout", path: "/logout", isLogout: true },
   ];

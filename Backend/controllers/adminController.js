@@ -54,44 +54,44 @@ export const loginAdmin = async (req, res) => {
   }
 };
 
-export const approveCompany = async (req, res) => {
-  try {
-    const { companyId, status } = req.body;
-    if (!["approved", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
+// export const approveCompany = async (req, res) => {
+//   try {
+//     const { companyId, status } = req.body;
+//     if (!["approved", "rejected"].includes(status)) {
+//       return res.status(400).json({ message: "Invalid status" });
+//     }
 
-    const company = await Company.findById(companyId);
-    if (!company) return res.status(404).json({ message: "Company not found" });
+//     const company = await Company.findById(companyId);
+//     if (!company) return res.status(404).json({ message: "Company not found" });
 
-    company.isApproved = status === "approved";
-    await company.save();
+//     company.isApproved = status === "approved";
+//     await company.save();
 
-    // Notification to company
-    await Notification.create({
-      recipientId: company._id,
-      recipientModel: "Company",
-      message: `Your company has been ${status} by the admin.`,
-    });
+//     // Notification to company
+//     await Notification.create({
+//       recipientId: company._id,
+//       recipientModel: "Company",
+//       message: `Your company has been ${status} by the admin.`,
+//     });
 
-    if (req.user.role !== "superadmin") {
-      const admin = await Admin.findOne({ email: req.user.email });
-      if (!admin) return res.status(404).json({ message: "Admin not found" });
+//     if (req.user.role !== "superadmin") {
+//       const admin = await Admin.findOne({ email: req.user.email });
+//       if (!admin) return res.status(404).json({ message: "Admin not found" });
 
-      admin.actions.push({
-        type: "companyApproval",
-        entityId: companyId,
-        status,
-        actionDate: new Date(),
-      });
-      await admin.save();
-    }
+//       admin.actions.push({
+//         type: "companyApproval",
+//         entityId: companyId,
+//         status,
+//         actionDate: new Date(),
+//       });
+//       await admin.save();
+//     }
 
-    res.status(200).json({ message: "Company approval updated", company });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
+//     res.status(200).json({ message: "Company approval updated", company });
+//   } catch (error) {
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// };
 
 export const validateJob = async (req, res) => {
   try {
@@ -317,5 +317,107 @@ export const getMonthlyJobApplications = async (req, res) => {
     res.status(200).json({ chartData });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+export const getActiveJobs = async (req, res) => {
+  try {
+    let jobs = [];
+
+    if (req.user.role === "admin") {
+      // Admin sees ALL active jobs
+      jobs = await Job.find({ isValid: true, isPublished: true })
+        .populate("companyId", "companyName companyLogo")
+        .sort({ postedDate: -1 });
+    } else if (req.user.role === "company") {
+      // Company sees only their own jobs
+      const companyId = new mongoose.Types.ObjectId(req.user.id);
+      jobs = await Job.find({ companyId, isValid: true, isPublished: true })
+        .populate("companyId", "companyName companyLogo")
+        .sort({ postedDate: -1 });
+    } else {
+      return res.status(403).json({ success: false, message: "Unauthorized access" });
+    }
+
+    res.status(200).json({ success: true, jobs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+// controllers/companyController.js
+
+
+// ✅ Get all companies pending approval
+export const getPendingCompanies = async (req, res) => {
+  try {
+    const companies = await Company.find({ isApproved: false })
+      .select("companyName companyDomain companyLogo signupDate isVerified");
+
+    if (!companies || companies.length === 0) {
+      return res.status(404).json({ message: "No pending companies found" });
+    }
+
+    res.status(200).json({ success: true, companies });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ✅ Get all approved companies
+export const getApprovedCompanies = async (req, res) => {
+  try {
+    const companies = await Company.find({ isApproved: true })
+      .select("companyName companyDomain companyLogo signupDate isVerified");
+
+    if (!companies || companies.length === 0) {
+      return res.status(404).json({ message: "No approved companies found" });
+    }
+
+    res.status(200).json({ success: true, companies });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const approveCompany = async (req, res) => {
+  try {
+    const company = await Company.findByIdAndUpdate(
+      req.params.id,
+      { isApproved: true },
+      { new: true }
+    );
+    if (!company) return res.status(404).json({ message: "Company not found" });
+    res.json({ message: "Company approved successfully", company });
+  } catch (error) {
+    res.status(500).json({ message: "Error approving company", error: error.message });
+  }
+};
+
+// Reject company (delete permanently)
+export const rejectCompany = async (req, res) => {
+  try {
+    const company = await Company.findByIdAndDelete(req.params.id);
+    if (!company) return res.status(404).json({ message: "Company not found" });
+    res.json({ message: "Company rejected and deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error rejecting company", error: error.message });
+  }
+};
+
+// Disapprove company (set back to not approved)
+export const disapproveCompany = async (req, res) => {
+  try {
+    const company = await Company.findByIdAndUpdate(
+      req.params.id,
+      { isApproved: false },
+      { new: true }
+    );
+    if (!company) return res.status(404).json({ message: "Company not found" });
+    res.json({ message: "Company disapproved successfully", company });
+  } catch (error) {
+    res.status(500).json({ message: "Error disapproving company", error: error.message });
   }
 };

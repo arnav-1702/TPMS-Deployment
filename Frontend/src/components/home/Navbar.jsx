@@ -45,9 +45,9 @@ const Navbar = () => {
 
       {/* Middle Nav Links */}
       <nav className="hidden md:flex space-x-8 text-lg font-medium">
-        <Link to="/" className="text-[#2D336B] hover:text-blue-600">
+        {/* <Link to="/" className="text-[#2D336B] hover:text-blue-600">
           Home
-        </Link>
+        </Link> */}
 
         {/* Candidate (logged in OR not) */}
         {(!role || role === "candidate") && (
@@ -84,6 +84,14 @@ const Navbar = () => {
             <Link to="/about" className="text-[#2D336B] hover:text-blue-600">
               About Us
             </Link>
+          </>
+        )}
+        {role === "admin" && (
+          <>
+            <Link to="/admin/dashboard" className="text-[#2D336B] hover:text-blue-600">
+              Home
+            </Link>
+            
           </>
         )}
       </nav>
