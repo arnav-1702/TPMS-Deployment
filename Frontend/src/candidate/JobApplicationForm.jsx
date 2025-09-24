@@ -6,6 +6,7 @@ export default function JobApplicationForm() {
   const { jobId } = useParams(); // ✅ get jobId from URL
   const [jobDetails, setJobDetails] = useState(null); // ✅ add jobDetails state
   const [formData, setFormData] = useState({
+    fullName: "", // ✅ added fullName
     age: "",
     cityOfResidence: "",
     homeTown: "",
@@ -140,14 +141,13 @@ export default function JobApplicationForm() {
           <div className="mb-8">
             <h2 className="text-lg font-medium mb-6 text-gray-800">Personal Information</h2>
             <div className="grid grid-cols-2 gap-6">
-              {[
+              {[["Full Name", "fullName"],
                 ["Age", "age"],
                 ["City of Residence", "cityOfResidence"],
                 ["Home Town", "homeTown"],
                 ["Years of Experience", "yearsOfExperience"],
                 ["Email", "email"],
-                ["Contact Number", "contactNumber"],
-              ].map(([label, name]) => (
+                ["Contact Number", "contactNumber"]].map(([label, name]) => (
                 <div key={name}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
                   <input
@@ -166,16 +166,14 @@ export default function JobApplicationForm() {
           <div className="mb-8">
             <h2 className="text-lg font-medium mb-6 text-gray-800">Educational Background</h2>
             <div className="grid grid-cols-2 gap-6">
-              {[
-                ["10th Percentage", "tenthPercentage"],
+              {[["10th Percentage", "tenthPercentage"],
                 ["12th Percentage", "twelfthPercentage"],
                 ["Bachelors Degree Name", "bachelorsDegree"],
                 ["Bachelors College Name", "bachelorsCollege"],
                 ["Masters Degree Name", "mastersDegree"],
                 ["Masters College Name", "mastersCollege"],
                 ["Bachelors CGPA", "bachelorsCGPA"],
-                ["Masters CGPA", "mastersCGPA"],
-              ].map(([label, name]) => (
+                ["Masters CGPA", "mastersCGPA"]].map(([label, name]) => (
                 <div key={name}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
                   <input
@@ -190,12 +188,11 @@ export default function JobApplicationForm() {
             </div>
           </div>
 
-          {/* Company Info */}
+          {/* Previous/Current Company */}
           <div className="mb-8">
             <h2 className="text-lg font-medium mb-6 text-gray-800">Previous/Current Company (not for freshers)</h2>
             <div className="grid grid-cols-2 gap-6">
-              {[
-                ["Company Name", "companyName"],
+              {[["Company Name", "companyName"],
                 ["Company Location", "companyLocation"],
                 ["Job Position", "jobPosition"],
                 ["Years in Company", "yearsInCompany"],
@@ -204,8 +201,7 @@ export default function JobApplicationForm() {
                 ["Salary Inhand (Yearly)", "salaryInhandYearly"],
                 ["Salary Inhand (Monthly)", "salaryInhandMonthly"],
                 ["Are You on Notice Period", "onNoticePeriod"],
-                ["Notice Period Duration", "noticePeriodDuration"],
-              ].map(([label, name]) => (
+                ["Notice Period Duration", "noticePeriodDuration"]].map(([label, name]) => (
                 <div key={name}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
                   <input
@@ -240,10 +236,8 @@ export default function JobApplicationForm() {
             </div>
 
             <div className="grid grid-cols-2 gap-6 mt-6">
-              {[
-                ["PAN India Job Location (Yes / No)", "panIndiaLocation"],
-                ["Preferred Job Location", "preferredLocation"],
-              ].map(([label, name]) => (
+              {[["PAN India Job Location (Yes / No)", "panIndiaLocation"],
+                ["Preferred Job Location", "preferredLocation"]].map(([label, name]) => (
                 <div key={name}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
                   <input
@@ -266,10 +260,8 @@ export default function JobApplicationForm() {
             </p>
 
             <div className="grid grid-cols-2 gap-6">
-              {[
-                ["Expected Salary CTC (Yearly)", "expectedSalaryCTCYearly"],
-                ["Expected Salary Inhand (Monthly)", "expectedSalaryInhandMonthly"],
-              ].map(([label, name]) => (
+              {[["Expected Salary CTC (Yearly)", "expectedSalaryCTCYearly"],
+                ["Expected Salary Inhand (Monthly)", "expectedSalaryInhandMonthly"]].map(([label, name]) => (
                 <div key={name}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
                   <input

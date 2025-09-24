@@ -104,7 +104,7 @@ export const getJobById = async (req, res) => {
 
     const job = await Job.findById(id).populate(
       "companyId",
-      "companyName description culture careerGrowth email"
+      "companyName companyDomain description culture careerGrowth disclaimer email"
     );
 
     if (!job) return res.status(404).json({ message: "Job not found." });
@@ -274,5 +274,104 @@ export const getVerifiedJobs = async (req, res) => {
       message: "Server error while fetching verified jobs",
       error: error.message,
     });
+  }
+};
+
+
+
+
+
+
+export const getJobByAdminId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Step 1: Find job by ID
+    const job = await Job.findById(id);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    // Step 2: Find company by job.companyId
+    let companyDetails = null;
+    if (job.companyId) {
+      companyDetails = await Company.findById(job.companyId).select(
+        "companyName companyDomain description culture careerGrowth disclaimer companyLogo"
+      );
+    }
+
+    // Step 3: Merge job + company details
+    const jobWithCompany = {
+      ...job.toObject(),
+      companyDetails: companyDetails ? companyDetails.toObject() : null,
+    };
+
+    res.status(200).json(jobWithCompany);
+  } catch (error) {
+    console.error("Error fetching job:", error);
+    res.status(500).json({ message: "Failed to fetch job details" });
+  }
+};
+
+
+
+
+export const approveJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await Job.findById(id);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    job.isValid = true; // mark as approved
+    await job.save();
+
+    // Optionally populate company info in response
+    const populatedJob = await Job.findById(id)
+      .populate("companyId", "companyName companyDomain description culture careerGrowth disclaimer");
+
+    res.status(200).json({ message: "Job approved successfully", job: populatedJob });
+  } catch (error) {
+    console.error("Error approving job:", error);
+    res.status(500).json({ message: "Failed to approve job", error: error.message });
+  }
+};
+
+// Reject a job (mark as invalid)
+export const rejectJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await Job.findById(id);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    job.isValid = false; // mark as rejected
+    await job.save();
+
+    res.status(200).json({ message: "Job rejected successfully", job });
+  } catch (error) {
+    console.error("Error rejecting job:", error);
+    res.status(500).json({ message: "Failed to reject job", error: error.message });
+  }
+};
+
+// Delete a job (also remove from candidates' applications)
+export const deleteJobAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const job = await Job.findByIdAndDelete(id);
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    // Remove job from candidates' applications
+    await Candidate.updateMany(
+      { "applications.jobId": id },
+      { $pull: { applications: { jobId: id } } }
+    );
+
+    res.status(200).json({ message: "Job deleted successfully and removed from candidates" });
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    res.status(500).json({ message: "Failed to delete job", error: error.message });
   }
 };

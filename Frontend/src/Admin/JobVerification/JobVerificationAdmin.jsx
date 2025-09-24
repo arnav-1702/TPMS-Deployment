@@ -55,7 +55,13 @@ const JobVerificationAdmin = () => {
   }, []);
 
   const goToJobDetails = (job, type) => {
-    navigate(`/job/${job._id}`, { state: { job, type } });
+    navigate(`/job/${job._id}`, {
+      state: {
+        job,
+        type,
+        companyId: job.companyId?._id || job.companyId, // ✅ Pass companyId as well
+      },
+    });
   };
 
   if (loading) {

@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import { loginAdmin, approveCompany, validateJob, reviewApplication, logoutAdmin, getAllJobs, getTotalCandidates, getTotalCompanies, getMonthlyJobPostings, getMonthlyJobApplications, getActiveJobs, getApprovedCompanies, disapproveCompany, rejectCompany } from '../controllers/adminController.js';
+import { loginAdmin, approveCompany, validateJob, reviewApplication, logoutAdmin, getAllJobs, getTotalCandidates, getTotalCompanies, getMonthlyJobPostings, getMonthlyJobApplications, getActiveJobs, getApprovedCompanies, disapproveCompany, rejectCompany, getJobById, getCandidatesByJobId } from '../controllers/adminController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { getPendingCompanies, getPendingJobs } from '../controllers/companyController.js';
 
@@ -23,4 +23,11 @@ router.get("/company/verified", getApprovedCompanies);
 router.put("/company/approve/:id", approveCompany);
 router.delete("/company/reject/:id", rejectCompany);
 router.put("/company/disapprove/:id", disapproveCompany);
+
+
+// applications
+router.get("/job/:jobId", getJobById);
+
+// ✅ Get candidates for a job
+router.get("/job/:jobId/candidates", getCandidatesByJobId);
 export default router;

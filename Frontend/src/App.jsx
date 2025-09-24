@@ -34,6 +34,8 @@ import ActiveJob from "./Admin/ActiveJobs/ActiveJob";
 import CompanyVerification from "./Admin/CompanyVerification/CompanyVerification";
 import CompanyVerificationDetails from "./Admin/CompanyVerification/CompanyVerificationDetails";
 import JobVerificationAdmin from "./Admin/JobVerification/JobVerificationAdmin";
+import JobVerificationAdminDetails from "./Admin/JobVerification/JobVerificationAdminDetails";
+import AdminShortlistCandidates from "./Admin/JobVerification/AdminShortlistCandidates";
 
 function App() {
   return (
@@ -187,7 +189,18 @@ function App() {
             }
           />
           
-          
+          <Route
+            path="/job/:id"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <JobVerificationAdminDetails></JobVerificationAdminDetails>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+          path="/job-applicants/:jobId"
+          element={<AdminShortlistCandidates />}
+        />
         </Routes>
 
         
