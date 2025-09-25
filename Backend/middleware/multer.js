@@ -48,10 +48,14 @@ export const uploadResume = makeUploader("resume"); // For resumes
 // Cloudinary upload helper
 export const uploadToCloudinary = (buffer, folder = "companyLogos") => {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream({ folder }, (error, result) => {
-      if (result) resolve(result.secure_url);
-      else reject(error);
-    });
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: "raw", folder },   // 👈 important for PDF/DOCX
+      (error, result) => {
+        if (result) resolve(result.secure_url);
+        else reject(error);
+      }
+    );
     streamifier.createReadStream(buffer).pipe(stream);
   });
 };
+
