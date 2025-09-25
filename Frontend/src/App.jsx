@@ -36,6 +36,9 @@ import CompanyVerificationDetails from "./Admin/CompanyVerification/CompanyVerif
 import JobVerificationAdmin from "./Admin/JobVerification/JobVerificationAdmin";
 import JobVerificationAdminDetails from "./Admin/JobVerification/JobVerificationAdminDetails";
 import AdminShortlistCandidates from "./Admin/JobVerification/AdminShortlistCandidates";
+import TPMSServicesPage from "./components/navcomponents/TPMSServicesPage";
+import AboutUsPage from "./components/navcomponents/AboutUsPage";
+import CandidateProfilePage from "./Admin/JobVerification/CandidateProfilePage";
 
 function App() {
   return (
@@ -54,7 +57,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route path="/services" element={<TPMSServicesPage />} />
+          <Route path="/about" element={<AboutUsPage />} />
           <Route path="/signupcandidate" element={<SignUpCandidate />} />
           <Route path="/logincandidate" element={<LoginCandidate />} />
           <Route path="/signupcompany" element={<SignUpCompany />} />
@@ -104,7 +108,7 @@ function App() {
             path="/jobverification"
             element={
               <ProtectedRoute allowedRoles={["company"]}>
-                <JobVerification/>
+                <JobVerification />
               </ProtectedRoute>
             }
           />
@@ -134,22 +138,11 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/adminlogin"
-            element={
-              
-                <AdminLogin></AdminLogin>
-              
-            }
-          />
+          <Route path="/adminlogin" element={<AdminLogin></AdminLogin>} />
 
           <Route
             path="/company/shortlistcandidate"
-            element={
-              
-                <ShortlistedCandidates></ShortlistedCandidates>
-              
-            }
+            element={<ShortlistedCandidates></ShortlistedCandidates>}
           />
           <Route path="/jobs/:jobId/candidates" element={<AllCandidates />} />
           {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
@@ -170,8 +163,8 @@ function App() {
             }
           />
           {/* /admin/active-jobs */}
-          
-           <Route
+
+          <Route
             path="/admin/company-verification"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
@@ -188,7 +181,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
+
           <Route
             path="/job/:id"
             element={
@@ -198,12 +191,18 @@ function App() {
             }
           />
           <Route
-          path="/job-applicants/:jobId"
-          element={<AdminShortlistCandidates />}
-        />
+            path="/job-applicants/:jobId"
+            element={<AdminShortlistCandidates />}
+          />
+          <Route
+            path="/admin/candidate/:candidateId"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <CandidateProfilePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-
-        
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ const JobApplicationSchema = new mongoose.Schema({
       candidateId: { type: mongoose.Schema.Types.ObjectId, ref: "Candidate", required: true },
 
       // Personal Info
+      fullName: String, // ✅ added
       age: Number,
       cityOfResidence: String,
       homeTown: String,

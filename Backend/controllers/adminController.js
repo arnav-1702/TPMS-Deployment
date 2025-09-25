@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import JobApplicationSchema from "../models/JobApplicationSchema.js";
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -455,5 +456,38 @@ export const getCandidatesByJobId = async (req, res) => {
     res.status(200).json({ success: true, candidates: jobApplication.candidates });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+
+
+export const getCandidateProfile = async (req, res) => {
+  try {
+    const { candidateId } = req.params;
+
+    // Find the job application that contains this candidate subdocument
+    const jobApp = await JobApplicationSchema.findOne({
+      "candidates._id": new mongoose.Types.ObjectId(candidateId),
+    });
+
+    if (!jobApp) {
+      return res.status(404).json({ message: "Candidate not found in job applications" });
+    }
+
+    // Extract the candidate by matching subdocument _id
+    const candidate = jobApp.candidates.id(candidateId);
+
+    if (!candidate) {
+      return res.status(404).json({ message: "Candidate not found" });
+    }
+
+    return res.status(200).json(candidate);
+  } catch (error) {
+    console.error("Error fetching candidate profile:", error);
+    return res.status(500).json({
+      message: "Server error while fetching candidate profile",
+      error: error.message,
+    });
   }
 };

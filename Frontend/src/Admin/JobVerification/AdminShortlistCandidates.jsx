@@ -1,3 +1,4 @@
+// src/pages/AdminShortlistCandidates.jsx
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -70,25 +71,26 @@ export default function AdminShortlistCandidates() {
 
         {/* Candidates Grid */}
         {candidates.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
             {candidates.map((candidate, index) => (
               <Link
                 key={candidate._id || index}
-                to={`/candidate/${candidate.candidateId}`}
+                to={`/admin/candidate/${candidate._id}`}
+                className="h-full"
               >
-                <div className="bg-white rounded-2xl p-6 border border-[#e5e7eb] shadow-sm hover:shadow-md transition cursor-pointer">
-                  <div className="flex items-center space-x-4">
+                <div className="bg-white rounded-2xl p-6 border border-[#e5e7eb] shadow-sm hover:shadow-md transition flex flex-col h-full">
+                  <div className="flex items-center space-x-4 flex-grow">
                     <img
                       src={
                         candidate.photo ||
                         "https://via.placeholder.com/100?text=User"
                       }
-                      alt={candidate.name || "Candidate"}
+                      alt={candidate.fullName || "Candidate"}
                       className="w-16 h-16 rounded-full object-cover border-2 border-[#2D336B]"
                     />
                     <div>
                       <h3 className="font-semibold text-[#111827] text-lg mb-1">
-                        {candidate.name || "Unknown"}
+                        {candidate.fullName || "Unknown"}
                       </h3>
                       <p className="text-sm text-[#6B7280] mb-1">
                         Experience: {candidate.yearsOfExperience || "N/A"} Years
