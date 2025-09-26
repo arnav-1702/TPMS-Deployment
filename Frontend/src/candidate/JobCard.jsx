@@ -24,7 +24,7 @@ function JobCard({ id, title, companyName, logo }) {
 
       {/* Open Button */}
       <button
-        onClick={() => navigate(`/job-detail/${id}`)}
+        onClick={() => navigate(`/findajob/${id}`)}
         className="flex items-center justify-center mx-auto text-[#2D336B] font-semibold hover:text-indigo-600 transition-colors"
       >
         Open

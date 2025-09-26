@@ -79,7 +79,7 @@ function App() {
             }
           />
           <Route
-            path="/job-detail/:id"
+            path="/findajob/:id"
             element={
               <ProtectedRoute allowedRoles={["candidate"]}>
                 <JobDetailsPage />

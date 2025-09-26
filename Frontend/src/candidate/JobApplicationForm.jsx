@@ -3,10 +3,11 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 export default function JobApplicationForm() {
-  const { jobId } = useParams(); // ✅ get jobId from URL
-  const [jobDetails, setJobDetails] = useState(null); // ✅ add jobDetails state
+  const { jobId } = useParams();
+  const [jobDetails, setJobDetails] = useState(null);
+  const [step, setStep] = useState(1); // ✅ step control
   const [formData, setFormData] = useState({
-    fullName: "", // ✅ added fullName
+    fullName: "",
     age: "",
     cityOfResidence: "",
     homeTown: "",
@@ -21,6 +22,7 @@ export default function JobApplicationForm() {
     mastersCollege: "",
     bachelorsCGPA: "",
     mastersCGPA: "",
+    fresher: "No",
     companyName: "",
     companyLocation: "",
     jobPosition: "",
@@ -60,6 +62,9 @@ export default function JobApplicationForm() {
       [name]: type === "file" ? files[0] : value,
     });
   };
+
+  const handleNext = () => setStep((prev) => prev + 1);
+  const handleBack = () => setStep((prev) => prev - 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -108,18 +113,6 @@ export default function JobApplicationForm() {
         <p className="text-center text-sm opacity-90 leading-relaxed px-2">
           Fill out your personal and professional information carefully to complete your application.
         </p>
-        <div className="flex flex-col items-center space-y-6">
-          <img
-            src="/assets/wearehiring.png"
-            alt="We are hiring"
-            className="w-36 h-24 object-contain"
-          />
-          <img
-            src="/assets/handshake.png"
-            alt="Handshake Illustration"
-            className="w-40 h-40 object-contain"
-          />
-        </div>
       </div>
 
       {/* Main Content */}
@@ -130,181 +123,232 @@ export default function JobApplicationForm() {
               ? `${jobDetails.jobPosition} | ${jobDetails.companyId?.companyName}`
               : "Loading job..."}
           </h1>
-          <div className="w-10 h-10 bg-indigo-700 rounded-full flex items-center justify-center">
-            <div className="w-6 h-6 bg-white rounded-full"></div>
-          </div>
         </div>
 
-        {/* Form */}
         <div className="p-8 max-w-4xl">
-          {/* Personal Information */}
-          <div className="mb-8">
-            <h2 className="text-lg font-medium mb-6 text-gray-800">Personal Information</h2>
-            <div className="grid grid-cols-2 gap-6">
-              {[["Full Name", "fullName"],
-                ["Age", "age"],
-                ["City of Residence", "cityOfResidence"],
-                ["Home Town", "homeTown"],
-                ["Years of Experience", "yearsOfExperience"],
-                ["Email", "email"],
-                ["Contact Number", "contactNumber"]].map(([label, name]) => (
-                <div key={name}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-                  <input
-                    type="text"
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
-                  />
+          {/* Step 1: Personal Information */}
+          {step === 1 && (
+            <div>
+              <h2 className="text-lg font-medium mb-6 text-gray-800">Personal Information</h2>
+              <div className="grid grid-cols-2 gap-6">
+                {[["Full Name", "fullName"],
+                  ["Age", "age"],
+                  ["City of Residence", "cityOfResidence"],
+                  ["Home Town", "homeTown"],
+                  ["Years of Experience", "yearsOfExperience"],
+                  ["Email", "email"],
+                  ["Contact Number", "contactNumber"]].map(([label, name]) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                    <input
+                      type="text"
+                      name={name}
+                      value={formData[name]}
+                      onChange={handleChange}
+                      className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-end mt-6">
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="bg-indigo-600 text-white px-8 py-3 rounded-md font-medium hover:bg-indigo-500 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Educational Background */}
+          {step === 2 && (
+            <div>
+              <h2 className="text-lg font-medium mb-6 text-gray-800">Educational Background</h2>
+              <div className="grid grid-cols-2 gap-6">
+                {[["10th Percentage", "tenthPercentage"],
+                  ["12th Percentage", "twelfthPercentage"],
+                  ["Bachelors Degree Name", "bachelorsDegree"],
+                  ["Bachelors College Name", "bachelorsCollege"],
+                  ["Masters Degree Name", "mastersDegree"],
+                  ["Masters College Name", "mastersCollege"],
+                  ["Bachelors CGPA", "bachelorsCGPA"],
+                  ["Masters CGPA", "mastersCGPA"]].map(([label, name]) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                    <input
+                      type="text"
+                      name={name}
+                      value={formData[name]}
+                      onChange={handleChange}
+                      className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between mt-6">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="bg-gray-300 text-gray-800 px-8 py-3 rounded-md font-medium hover:bg-gray-400 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="bg-indigo-600 text-white px-8 py-3 rounded-md font-medium hover:bg-indigo-500 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Employment Information */}
+          {step === 3 && (
+            <div>
+              <h2 className="text-lg font-medium mb-6 text-gray-800">Previous/Current Company</h2>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Are You a Fresher?</label>
+                <select
+                  name="fresher"
+                  value={formData.fresher}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+
+              {formData.fresher === "No" && (
+                <div className="grid grid-cols-2 gap-6">
+                  {[["Company Name", "companyName"],
+                    ["Company Location", "companyLocation"],
+                    ["Job Position", "jobPosition"],
+                    ["Years in Company", "yearsInCompany"],
+                    ["Salary CTC (Yearly)", "salaryCTCYearly"],
+                    ["Salary CTC (Monthly)", "salaryCTCMonthly"],
+                    ["Salary Inhand (Yearly)", "salaryInhandYearly"],
+                    ["Salary Inhand (Monthly)", "salaryInhandMonthly"],
+                    ["Are You on Notice Period", "onNoticePeriod"],
+                    ["Notice Period Duration", "noticePeriodDuration"]].map(([label, name]) => (
+                    <div key={name}>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                      <input
+                        type="text"
+                        name={name}
+                        value={formData[name]}
+                        onChange={handleChange}
+                        className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Skills Summary</label>
+                <textarea
+                  name="skillsSummary"
+                  value={formData.skillsSummary}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-white h-24 resize-none focus:ring-indigo-500 focus:border-indigo-500"
+                ></textarea>
+              </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Reason For Job Change</label>
+                <textarea
+                  name="reasonForJobChange"
+                  value={formData.reasonForJobChange}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-white h-24 resize-none focus:ring-indigo-500 focus:border-indigo-500"
+                ></textarea>
+              </div>
+
+              <div className="flex justify-between mt-6">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="bg-gray-300 text-gray-800 px-8 py-3 rounded-md font-medium hover:bg-gray-400 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="bg-indigo-600 text-white px-8 py-3 rounded-md font-medium hover:bg-indigo-500 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Educational Background */}
-          <div className="mb-8">
-            <h2 className="text-lg font-medium mb-6 text-gray-800">Educational Background</h2>
-            <div className="grid grid-cols-2 gap-6">
-              {[["10th Percentage", "tenthPercentage"],
-                ["12th Percentage", "twelfthPercentage"],
-                ["Bachelors Degree Name", "bachelorsDegree"],
-                ["Bachelors College Name", "bachelorsCollege"],
-                ["Masters Degree Name", "mastersDegree"],
-                ["Masters College Name", "mastersCollege"],
-                ["Bachelors CGPA", "bachelorsCGPA"],
-                ["Masters CGPA", "mastersCGPA"]].map(([label, name]) => (
-                <div key={name}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-                  <input
-                    type="text"
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              ))}
+          {/* Step 4: Job Preferences & Resume Upload */}
+          {step === 4 && (
+            <div>
+              <h2 className="text-lg font-medium mb-6 text-gray-800">Job Preferences & Uploads</h2>
+
+              <div className="grid grid-cols-2 gap-6">
+                {[["PAN India Job Location (Yes / No)", "panIndiaLocation"],
+                  ["Preferred Job Location", "preferredLocation"],
+                  ["Expected Salary CTC (Yearly)", "expectedSalaryCTCYearly"],
+                  ["Expected Salary Inhand (Monthly)", "expectedSalaryInhandMonthly"]].map(([label, name]) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                    <input
+                      type="text"
+                      name={name}
+                      value={formData[name]}
+                      onChange={handleChange}
+                      className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
+                <input
+                  type="file"
+                  name="photo"
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-white"
+                />
+              </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload Resume</label>
+                <input
+                  type="file"
+                  name="resume"
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-md bg-white"
+                />
+              </div>
+
+              <div className="flex justify-between mt-6">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="bg-gray-300 text-gray-800 px-8 py-3 rounded-md font-medium hover:bg-gray-400 transition-colors"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="bg-indigo-600 text-white px-8 py-3 rounded-md font-medium hover:bg-indigo-500 transition-colors"
+                >
+                  Submit
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Previous/Current Company */}
-          <div className="mb-8">
-            <h2 className="text-lg font-medium mb-6 text-gray-800">Previous/Current Company (not for freshers)</h2>
-            <div className="grid grid-cols-2 gap-6">
-              {[["Company Name", "companyName"],
-                ["Company Location", "companyLocation"],
-                ["Job Position", "jobPosition"],
-                ["Years in Company", "yearsInCompany"],
-                ["Salary CTC (Yearly)", "salaryCTCYearly"],
-                ["Salary CTC (Monthly)", "salaryCTCMonthly"],
-                ["Salary Inhand (Yearly)", "salaryInhandYearly"],
-                ["Salary Inhand (Monthly)", "salaryInhandMonthly"],
-                ["Are You on Notice Period", "onNoticePeriod"],
-                ["Notice Period Duration", "noticePeriodDuration"]].map(([label, name]) => (
-                <div key={name}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-                  <input
-                    type="text"
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Describe About Your Skills in Short</label>
-              <textarea
-                name="skillsSummary"
-                value={formData.skillsSummary}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md bg-white h-24 resize-none focus:ring-indigo-500 focus:border-indigo-500"
-              ></textarea>
-            </div>
-
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Reason For Job Change</label>
-              <textarea
-                name="reasonForJobChange"
-                value={formData.reasonForJobChange}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md bg-white h-24 resize-none focus:ring-indigo-500 focus:border-indigo-500"
-              ></textarea>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6 mt-6">
-              {[["PAN India Job Location (Yes / No)", "panIndiaLocation"],
-                ["Preferred Job Location", "preferredLocation"]].map(([label, name]) => (
-                <div key={name}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-                  <input
-                    type="text"
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Resume & Salary */}
-          <div className="mb-8">
-            <h2 className="text-lg font-medium mb-6 text-gray-800">Resume Upload</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Upload your resume with a photograph on top right hand side corner in pdf form
-            </p>
-
-            <div className="grid grid-cols-2 gap-6">
-              {[["Expected Salary CTC (Yearly)", "expectedSalaryCTCYearly"],
-                ["Expected Salary Inhand (Monthly)", "expectedSalaryInhandMonthly"]].map(([label, name]) => (
-                <div key={name}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-                  <input
-                    type="text"
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-md bg-white focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
-              <input
-                type="file"
-                name="photo"
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md bg-white"
-              />
-            </div>
-
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Upload Resume</label>
-              <input
-                type="file"
-                name="resume"
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-md bg-white"
-              />
-            </div>
-          </div>
-
-          {/* Submit */}
-          <div className="flex justify-start">
-            <button
-              type="submit"
-              className="bg-indigo-600 text-white px-8 py-3 rounded-md font-medium hover:bg-indigo-500 transition-colors"
-            >
-              Submit
-            </button>
-          </div>
         </div>
       </div>
     </form>

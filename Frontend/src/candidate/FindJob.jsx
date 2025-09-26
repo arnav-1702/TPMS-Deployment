@@ -6,6 +6,9 @@ import JobCard from "./JobCard";
 import Footer from "../components/home/Footer.jsx";
 import Navbar from "../components/home/Navbar.jsx";
 
+// React Icons
+import { FiSearch, FiMapPin } from "react-icons/fi";
+
 export default function FindJob() {
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
@@ -17,6 +20,7 @@ export default function FindJob() {
     location: "",
     company: "All Companies",
     domain: "All Domains",
+    date: "Anytime",
   });
 
   const navigate = useNavigate();
@@ -29,13 +33,14 @@ export default function FindJob() {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         });
-        console.log("Fetched jobs:", response.data);
         setJobs(response.data);
         setFilteredJobs(response.data);
 
         // Extract companies & domains for dropdowns
         const uniqueCompanies = [
-          ...new Set(response.data.map((j) => j.companyId?.companyName).filter(Boolean)),
+          ...new Set(
+            response.data.map((j) => j.companyId?.companyName).filter(Boolean)
+          ),
         ];
         const uniqueDomains = [
           ...new Set(response.data.map((j) => j.domain).filter(Boolean)),
@@ -53,7 +58,7 @@ export default function FindJob() {
   const handleCardClick = (jobId) => {
     const job = jobs.find((j) => j._id === jobId);
     if (job) {
-      navigate(`/job-detail/${jobId}`, { state: { companyId: job.companyId?._id } });
+      navigate(`/findajob/${jobId}`, { state: { companyId: job.companyId?._id } });
     }
   };
 
@@ -61,7 +66,7 @@ export default function FindJob() {
   const applyFilters = () => {
     let filtered = jobs;
 
-    // Search by job title / keywords
+    // Search by job title
     if (filters.search.trim()) {
       filtered = filtered.filter((j) =>
         j.jobPosition?.toLowerCase().includes(filters.search.toLowerCase())
@@ -85,6 +90,24 @@ export default function FindJob() {
       filtered = filtered.filter((j) => j.domain === filters.domain);
     }
 
+    // Filter by posted date
+    if (filters.date !== "Anytime") {
+      const now = new Date();
+      let cutoff = null;
+
+      if (filters.date === "Last 24 hours") {
+        cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      } else if (filters.date === "Last 7 days") {
+        cutoff = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (filters.date === "Last 30 days") {
+        cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      }
+
+      if (cutoff) {
+        filtered = filtered.filter((j) => new Date(j.postedDate) >= cutoff);
+      }
+    }
+
     setFilteredJobs(filtered);
   };
 
@@ -95,13 +118,13 @@ export default function FindJob() {
       location: "",
       company: "All Companies",
       domain: "All Domains",
+      date: "Anytime",
     });
     setFilteredJobs(jobs);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* Navbar */}
       <Navbar />
 
       {/* Hero Section */}
@@ -119,7 +142,7 @@ export default function FindJob() {
         <div className="flex items-center bg-[#FFF2F2] rounded-full shadow-lg px-6 py-2 border border-gray-200 max-w-4xl mx-auto mb-16">
           {/* Job Title / Keywords */}
           <div className="flex items-center flex-[1.5] min-w-[200px]">
-            <img src="/assets/search.png" alt="Job" className="w-5 h-5 mr-3" />
+            <FiSearch className="w-5 h-5 mr-3 text-gray-500" />
             <input
               type="text"
               placeholder="Job Title, Keywords"
@@ -134,7 +157,7 @@ export default function FindJob() {
 
           {/* Location */}
           <div className="flex items-center flex-1">
-            <img src="/assets/location.png" alt="Location" className="w-5 h-5 mr-3" />
+            <FiMapPin className="w-5 h-5 mr-3 text-gray-500" />
             <input
               type="text"
               placeholder="Location"
@@ -149,8 +172,7 @@ export default function FindJob() {
             onClick={applyFilters}
             className="ml-6 px-6 py-3 bg-[#7886C7] text-white rounded-full flex items-center gap-2 hover:bg-indigo-600 transition-colors font-medium text-base shadow-md"
           >
-            Find Job
-            <img src="/assets/searchinbutton.png" alt="Search" className="w-4 h-4" />
+            Find Job <FiSearch className="w-4 h-4" />
           </button>
         </div>
       </section>
@@ -182,6 +204,18 @@ export default function FindJob() {
             ))}
           </select>
 
+          {/* Date Filter */}
+          <select
+            value={filters.date}
+            onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+            className="px-4 py-2 border rounded-md bg-white shadow-sm"
+          >
+            <option>Anytime</option>
+            <option>Last 24 hours</option>
+            <option>Last 7 days</option>
+            <option>Last 30 days</option>
+          </select>
+
           {/* Buttons */}
           <button
             onClick={applyFilters}
@@ -211,7 +245,11 @@ export default function FindJob() {
                 <JobCard
                   title={job.jobPosition}
                   companyName={job.companyId?.companyName || "Unknown Company"}
-                  logo={job.companyLogo || job.companyId?.companyLogo || "/assets/default-logo.png"}
+                  logo={
+                    job.companyLogo ||
+                    job.companyId?.companyLogo ||
+                    "/assets/default-logo.png"
+                  }
                 />
               </div>
             ))
@@ -221,7 +259,6 @@ export default function FindJob() {
         </div>
       </section>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

@@ -4,6 +4,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "@/components/home/Navbar";
 import Footer from "@/components/home/Footer";
+import { HiArrowLeft } from "react-icons/hi"; // ✅ correct import
 
 const JobDetailsPage = () => {
   const { id } = useParams();
@@ -63,6 +64,15 @@ const JobDetailsPage = () => {
       <Navbar />
 
       <div className="max-w-4xl mx-auto py-10 px-4">
+        {/* ✅ Back Button */}
+        <button
+          onClick={() => navigate("/findajob")}
+          className="flex items-center gap-2 mb-6 text-indigo-600 hover:text-indigo-800 font-medium"
+        >
+          <HiArrowLeft className="text-lg" />
+          Back to Jobs
+        </button>
+
         {/* Job Header */}
         <div className="bg-white shadow rounded-xl p-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">

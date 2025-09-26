@@ -491,3 +491,59 @@ export const getCandidateProfile = async (req, res) => {
     });
   }
 };
+
+
+
+// Approve or Reject candidate
+export const reviewCandidateApplication = async (req, res) => {
+  try {
+    const { jobId, candidateId } = req.params;
+    const { status } = req.body; // "approved" | "rejected"
+    const adminId = req.user._id; // assuming JWT middleware sets req.user
+
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    // ✅ Update JobApplication collection
+    const jobApplication = await JobApplication.findOneAndUpdate(
+      { jobId, "candidates.candidateId": candidateId },
+      {
+        $set: {
+          "candidates.$.status": status,
+          "candidates.$.reviewedBy": adminId,
+        },
+      },
+      { new: true }
+    );
+
+    if (!jobApplication) {
+      return res.status(404).json({ message: "Job application not found" });
+    }
+
+    // ✅ Update Candidate collection
+    const candidate = await Candidate.findOneAndUpdate(
+      { _id: candidateId, "applications.jobId": jobId },
+      {
+        $set: {
+          "applications.$.status": status,
+          "applications.$.reviewedBy": adminId,
+        },
+      },
+      { new: true }
+    );
+
+    if (!candidate) {
+      return res.status(404).json({ message: "Candidate not found" });
+    }
+
+    res.status(200).json({
+      message: `Candidate ${status} successfully`,
+      jobApplication,
+      candidate,
+    });
+  } catch (error) {
+    console.error("Error reviewing candidate:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
