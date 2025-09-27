@@ -68,11 +68,9 @@ export default function AllCandidates() {
             {candidates.map((candidate) => (
               <Link
                 key={
-                  candidate._id ||
-                  candidate.candidateId?._id ||
-                  String(candidate.candidateId)
+                  candidate.candidateId?._id || String(candidate.candidateId)
                 }
-                to={`/candidate/${
+                to={`/candidate/${jobId}/${
                   candidate.candidateId?._id || candidate.candidateId
                 }`}
               >

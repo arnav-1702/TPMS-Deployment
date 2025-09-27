@@ -1,4 +1,5 @@
 import Company from "../models/companyModel.js";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -371,35 +372,69 @@ export const getJobCandidates = async (req, res) => {
 
 
 
+// export const getCandidateDetails = async (req, res) => {
+//   try {
+//     const { candidateId } = req.params; // this is the candidateId from URL
+
+//     // Find the JobApplication that contains this candidate
+//     const jobApp = await JobApplicationSchema.findOne({
+//       "candidates.candidateId": candidateId,
+//     });
+
+//     if (!jobApp) {
+//       return res.status(404).json({ message: "Candidate not found in any job application" });
+//     }
+
+//     // Extract the candidate object from candidates array
+//     const candidate = jobApp.candidates.find(
+//       (c) => String(c.candidateId) === String(candidateId)
+//     );
+
+//     if (!candidate) {
+//       return res.status(404).json({ message: "Candidate not found in job application" });
+//     }
+
+//     // Only return candidate object
+//     res.status(200).json(candidate);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server error", error: err.message });
+//   }
+// };
+
+
+
 export const getCandidateDetails = async (req, res) => {
   try {
-    const { candidateId } = req.params; // this is the candidateId from URL
+    const { jobId, candidateId } = req.params;
+    console.log("JobId", jobId);
+    console.log("candidateId", candidateId);
 
-    // Find the JobApplication that contains this candidate
-    const jobApp = await JobApplicationSchema.findOne({
-      "candidates.candidateId": candidateId,
-    });
+    // Find the job application first
+    const jobApp = await JobApplicationSchema.findOne({ jobId });
 
     if (!jobApp) {
-      return res.status(404).json({ message: "Candidate not found in any job application" });
+      return res.status(404).json({ message: "Job not found" });
     }
 
-    // Extract the candidate object from candidates array
+    // Search for candidate in the candidates array with status approved
     const candidate = jobApp.candidates.find(
-      (c) => String(c.candidateId) === String(candidateId)
+      (c) => String(c.candidateId) === String(candidateId) && c.status === "approved"
     );
 
     if (!candidate) {
-      return res.status(404).json({ message: "Candidate not found in job application" });
+      return res.status(404).json({ message: "Approved candidate not found for this job" });
     }
 
-    // Only return candidate object
+    // Return candidate details
     res.status(200).json(candidate);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+
 
 
 

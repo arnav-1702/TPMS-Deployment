@@ -5,7 +5,7 @@ import axios from "axios";
 import Footer from "@/components/home/Footer";
 
 export default function CompanySeeCandidate() {
-  const { candidateId } = useParams();
+  const { jobId, candidateId } = useParams(); // now using both jobId and candidateId
   const [candidate, setCandidate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,19 +17,19 @@ export default function CompanySeeCandidate() {
     const fetchCandidate = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/company/candidate/${candidateId}`,
+          `http://localhost:8000/company/candidate/${jobId}/${candidateId}`,
           { headers }
         );
         setCandidate(res.data);
       } catch (err) {
-        setError("Failed to load candidate details");
+        setError(err.response?.data?.message || "Failed to load candidate details");
       } finally {
         setLoading(false);
       }
     };
 
     fetchCandidate();
-  }, [candidateId]);
+  }, [jobId, candidateId]);
 
   if (loading) {
     return (
@@ -61,7 +61,6 @@ export default function CompanySeeCandidate() {
           <div className="lg:col-span-1">
             <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="p-4 sm:p-6 text-center">
-                {/* Profile Image */}
                 <div className="h-24 w-24 mx-auto mb-4 rounded-full overflow-hidden border">
                   <img
                     src={candidate.photo || "https://via.placeholder.com/100?text=User"}
@@ -70,7 +69,6 @@ export default function CompanySeeCandidate() {
                   />
                 </div>
 
-                {/* Name & Title */}
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">
                   {candidate.fullName || "Unknown"}
                 </h2>
@@ -78,13 +76,11 @@ export default function CompanySeeCandidate() {
                   {candidate.jobPosition || "Candidate"}
                 </p>
 
-                {/* Location + Experience */}
                 <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-gray-500 mb-4 sm:mb-6">
                   <div className="flex items-center gap-1">📍 {candidate.cityOfResidence || "N/A"}</div>
                   <div className="flex items-center gap-1">👨‍💻 {candidate.yearsOfExperience || 0} Years Exp</div>
                 </div>
 
-                {/* Contact Information */}
                 <div className="border-t border-gray-200 pt-4 sm:pt-6 text-left">
                   <h3 className="font-semibold text-gray-900 mb-3 sm:mb-4">Contact Information</h3>
                   <div className="space-y-2 text-sm sm:text-base">
@@ -111,8 +107,14 @@ export default function CompanySeeCandidate() {
                 <div className="space-y-4">
                   <Info label="10th Percentage" value={`${candidate.tenthPercentage || "N/A"}%`} />
                   <Info label="12th Percentage" value={`${candidate.twelfthPercentage || "N/A"}%`} />
-                  <Info label="Bachelor's Degree" value={`${candidate.bachelorsDegree || "N/A"} (${candidate.bachelorsCGPA || "N/A"} CGPA) - ${candidate.bachelorsCollege || "N/A"}`} />
-                  <Info label="Master's Degree" value={`${candidate.mastersDegree || "N/A"} (${candidate.mastersCGPA || "N/A"} CGPA) - ${candidate.mastersCollege || "N/A"}`} />
+                  <Info
+                    label="Bachelor's Degree"
+                    value={`${candidate.bachelorsDegree || "N/A"} (${candidate.bachelorsCGPA || "N/A"} CGPA) - ${candidate.bachelorsCollege || "N/A"}`}
+                  />
+                  <Info
+                    label="Master's Degree"
+                    value={`${candidate.mastersDegree || "N/A"} (${candidate.mastersCGPA || "N/A"} CGPA) - ${candidate.mastersCollege || "N/A"}`}
+                  />
                 </div>
               }
             />
@@ -171,7 +173,6 @@ export default function CompanySeeCandidate() {
               color="red"
               content={
                 <div className="space-y-3">
-                  {/* Resume */}
                   {candidate.resume ? (
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-gray-50 rounded-lg gap-3 sm:gap-0">
                       <div>
@@ -190,8 +191,6 @@ export default function CompanySeeCandidate() {
                   ) : (
                     <p className="text-gray-500">No resume uploaded</p>
                   )}
-
-                  {/* Optional PDF preview */}
                   {candidate.resume && candidate.resume.endsWith(".pdf") && (
                     <iframe
                       src={candidate.resume}

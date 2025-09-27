@@ -15,5 +15,5 @@ router.get("/jobs", authMiddleware, getCompanyJobs);
 // Get shortlisted candidates for a specific job
 // GET /company/jobs/:jobId/candidates
 router.get("/jobs/:jobId/candidates", authMiddleware, getJobCandidates);
-router.get("/candidate/:candidateId", authMiddleware, getCandidateDetails);
+router.get("/candidate/:jobId/:candidateId", authMiddleware, getCandidateDetails);
 export default router;

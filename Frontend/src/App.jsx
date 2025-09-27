@@ -147,7 +147,7 @@ function App() {
           />
           <Route path="/jobs/:jobId/candidates" element={<AllCandidates />} />
           {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
-           <Route path="/candidate/:candidateId" element={<CompanySeeCandidate />} />
+           <Route path="/candidate/:jobId/:candidateId" element={<CompanySeeCandidate />} />
           <Route
             path="/admin/dashboard"
             element={
