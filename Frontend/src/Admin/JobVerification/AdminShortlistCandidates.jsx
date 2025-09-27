@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Footer from "@/components/home/Footer";
 import Navbar from "@/components/home/Navbar";
+import Loader from "@/components/home/Loader";
 
 export default function AdminShortlistCandidates() {
   const { jobId } = useParams();
@@ -76,11 +77,7 @@ export default function AdminShortlistCandidates() {
   }, [search, minExp, maxExp, candidates]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Loading...</p>
-      </div>
-    );
+    return <Loader></Loader>
   }
 
   if (error) {

@@ -495,55 +495,74 @@ export const getCandidateProfile = async (req, res) => {
 
 
 // Approve or Reject candidate
-export const reviewCandidateApplication = async (req, res) => {
+// Approve Candidate
+// Approve Candidate
+export const approveCandidate = async (req, res) => {
   try {
-    const { jobId, candidateId } = req.params;
-    const { status } = req.body; // "approved" | "rejected"
-    const adminId = req.user._id; // assuming JWT middleware sets req.user
+    const { candidateId } = req.params;
 
-    if (!["approved", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
-
-    // ✅ Update JobApplication collection
-    const jobApplication = await JobApplication.findOneAndUpdate(
-      { jobId, "candidates.candidateId": candidateId },
-      {
-        $set: {
-          "candidates.$.status": status,
-          "candidates.$.reviewedBy": adminId,
-        },
-      },
+    // 1️⃣ Update status inside JobApplication.candidates
+    const jobApp = await JobApplicationSchema.findOneAndUpdate(
+      { "candidates._id": candidateId },
+      { $set: { "candidates.$.status": "approved" } },
       { new: true }
     );
 
-    if (!jobApplication) {
-      return res.status(404).json({ message: "Job application not found" });
+    if (!jobApp) {
+      return res.status(404).json({ message: "Candidate not found in job applications" });
     }
 
-    // ✅ Update Candidate collection
-    const candidate = await Candidate.findOneAndUpdate(
-      { _id: candidateId, "applications.jobId": jobId },
-      {
-        $set: {
-          "applications.$.status": status,
-          "applications.$.reviewedBy": adminId,
+    // 2️⃣ Update only the relevant application in Candidate.applications
+    const matchedCandidate = jobApp.candidates.find(c => c._id.toString() === candidateId);
+
+    if (matchedCandidate) {
+      await Candidate.updateOne(
+        { 
+          _id: matchedCandidate.candidateId, 
+          "applications.jobId": jobApp.jobId // match the correct job
         },
-      },
-      { new: true }
-    );
-
-    if (!candidate) {
-      return res.status(404).json({ message: "Candidate not found" });
+        { $set: { "applications.$.status": "approved" } }
+      );
     }
 
-    res.status(200).json({
-      message: `Candidate ${status} successfully`,
-      jobApplication,
-      candidate,
-    });
+    return res.status(200).json({ message: "Candidate approved successfully", jobApp });
   } catch (error) {
-    console.error("Error reviewing candidate:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("Error approving candidate:", error);
+    return res.status(500).json({ message: "Server error while approving candidate" });
   }
 };
+
+// Reject Candidate
+export const rejectCandidate = async (req, res) => {
+  try {
+    const { candidateId } = req.params;
+
+    const jobApp = await JobApplicationSchema.findOneAndUpdate(
+      { "candidates._id": candidateId },
+      { $set: { "candidates.$.status": "rejected" } },
+      { new: true }
+    );
+
+    if (!jobApp) {
+      return res.status(404).json({ message: "Candidate not found in job applications" });
+    }
+
+    const matchedCandidate = jobApp.candidates.find(c => c._id.toString() === candidateId);
+
+    if (matchedCandidate) {
+      await Candidate.updateOne(
+        { 
+          _id: matchedCandidate.candidateId, 
+          "applications.jobId": jobApp.jobId // match only this job
+        },
+        { $set: { "applications.$.status": "rejected" } }
+      );
+    }
+
+    return res.status(200).json({ message: "Candidate rejected successfully", jobApp });
+  } catch (error) {
+    console.error("Error rejecting candidate:", error);
+    return res.status(500).json({ message: "Server error while rejecting candidate" });
+  }
+};
+

@@ -82,20 +82,32 @@ export default function CandidateProfilePage() {
       <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
         <h2 className="text-xl font-semibold text-gray-900">Candidate Details</h2>
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleApprove}
-            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-xl shadow-md hover:bg-green-600 transition-colors font-medium"
-          >
-            <span>✓</span>
-            <span>Approve</span>
-          </button>
-          <button
-            onClick={handleReject}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl shadow hover:bg-red-700 transition-colors"
-          >
-            <span className="text-white font-medium">✕</span>
-            <span className="text-white font-medium">Reject</span>
-          </button>
+          {candidate.status === "approved" ? (
+            <span className="text-green-600 font-semibold text-lg flex items-center gap-2">
+              ✅ Approved Already
+            </span>
+          ) : candidate.status === "rejected" ? (
+            <span className="text-red-600 font-semibold text-lg flex items-center gap-2">
+              ❌ Rejected Already
+            </span>
+          ) : (
+            <>
+              <button
+                onClick={handleApprove}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-xl shadow-md hover:bg-green-600 transition-colors font-medium"
+              >
+                <span>✓</span>
+                <span>Approve</span>
+              </button>
+              <button
+                onClick={handleReject}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl shadow hover:bg-red-700 transition-colors"
+              >
+                <span className="text-white font-medium">✕</span>
+                <span className="text-white font-medium">Reject</span>
+              </button>
+            </>
+          )}
         </div>
       </header>
 
