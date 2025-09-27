@@ -39,6 +39,7 @@ import AdminShortlistCandidates from "./Admin/JobVerification/AdminShortlistCand
 import TPMSServicesPage from "./components/navcomponents/TPMSServicesPage";
 import AboutUsPage from "./components/navcomponents/AboutUsPage";
 import CandidateProfilePage from "./Admin/JobVerification/CandidateProfilePage";
+import CompanySeeCandidate from "./company/shortlistedcandidates/CompanySeeCandidate";
 
 function App() {
   return (
@@ -146,6 +147,7 @@ function App() {
           />
           <Route path="/jobs/:jobId/candidates" element={<AllCandidates />} />
           {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
+           <Route path="/candidate/:candidateId" element={<CompanySeeCandidate />} />
           <Route
             path="/admin/dashboard"
             element={

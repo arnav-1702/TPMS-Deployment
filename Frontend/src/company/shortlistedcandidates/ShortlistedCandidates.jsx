@@ -1,98 +1,135 @@
+// src/pages/company/CompanyJobs.jsx
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Footer from "@/components/home/Footer";
+import axios from "axios";
 import Navbar from "@/components/home/Navbar";
+import Footer from "@/components/home/Footer";
 
-export default function ShortlistedCandidates() {
-  const jobs = [
-    {
-      id: 1,
-      title: "Senior Frontend Developer",
-      type: "Full-time",
-      location: "Remote",
-      posted: "5 days ago",
-      shortlistedCount: 12,
-      candidates: [
-        { id: "c1", name: "Sarah Johnson", experience: "5 Years", email: "xxx@gmail.com", phone: "1234567897", avatar: "/assets/sarahjohnson.png" },
-        { id: "c2", name: "Michael Lee", experience: "3 Years", email: "yyy@gmail.com", phone: "9876543210", avatar: "/assets/sarahjohnson.png" },
-        { id: "c3", name: "Emma Watson", experience: "6 Years", email: "zzz@gmail.com", phone: "1112223334", avatar: "/assets/sarahjohnson.png" },
-      ],
-    },
-    {
-      id: 2,
-      title: "UI/UX Designer",
-      type: "Full-time",
-      location: "Hybrid",
-      posted: "3 days ago",
-      shortlistedCount: 8,
-      candidates: [
-        { id: "c4", name: "Sarah Johnson", experience: "5 Years", email: "xxx@gmail.com", phone: "1234567897", avatar: "/assets/sarahjohnson.png" },
-        { id: "c5", name: "John Doe", experience: "4 Years", email: "abc@gmail.com", phone: "4561237890", avatar: "/assets/sarahjohnson.png" },
-      ],
-    },
-  ];
+export default function CompanyJobs() {
+  const [jobs, setJobs] = useState([]);
+  const [filterType, setFilterType] = useState("all");
+  const [sortOrder, setSortOrder] = useState("desc"); // latest first
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/company/jobs", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        setJobs(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchJobs();
+  }, []);
+
+  // Filtered + Sorted Jobs
+  const filteredJobs = jobs
+    .filter((job) =>
+      filterType === "all" ? true : job.type.toLowerCase() === filterType.toLowerCase()
+    )
+    .filter((job) => job.jobPosition.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      const dateA = new Date(a.postedDate);
+      const dateB = new Date(b.postedDate);
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
 
   return (
-    <div className="min-h-screen bg-[#f9fafb]">
+    <div className="flex flex-col min-h-screen bg-[#f9fafb]">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-6 py-10 space-y-10">
-        {jobs.map((job) => (
-          <div key={job.id} className="bg-white rounded-2xl shadow-sm border border-[#e5e7eb]">
-            {/* Job Header */}
-            <div className="flex justify-between items-center bg-[#2D336B] text-white rounded-t-2xl px-6 py-4">
-              <div>
-                <h2 className="text-xl font-semibold">{job.title}</h2>
-                <p className="text-sm opacity-90">
-                  {job.type} • {job.location} • Posted {job.posted}
-                </p>
-              </div>
-              <p className="text-lg font-semibold">
-                Shortlisted Candidates {job.shortlistedCount}
-              </p>
-            </div>
 
-            {/* Candidates Preview */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-              {job.candidates.map((candidate) => (
-                <Link key={candidate.id} to={`/candidate/${candidate.id}`}>
-                  <div className="bg-white rounded-2xl p-6 border border-[#e5e7eb] shadow-sm hover:shadow-md transition cursor-pointer">
-                    <div className="flex items-center space-x-4">
-                      <img
-                        src={candidate.avatar}
-                        alt={candidate.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-[#2D336B]"
-                      />
-                      <div>
-                        <h3 className="font-semibold text-[#111827] text-lg mb-1">
-                          {candidate.name}
-                        </h3>
-                        <p className="text-sm text-[#6B7280] mb-1">
-                          Experience: {candidate.experience}
-                        </p>
-                        <p className="text-sm text-[#6B7280] mb-1">
-                          Email: {candidate.email}
-                        </p>
-                        <p className="text-sm text-[#6B7280]">
-                          Phone: {candidate.phone}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+      {/* Main content grows to fill available space */}
+      <main className="flex-grow max-w-7xl mx-auto px-6 py-10">
+        <h1 className="text-3xl font-semibold text-[#1F2937] mb-6">Your Jobs</h1>
 
-            {/* View All Link */}
-            <div className="text-center pb-6">
-              <Link
-                to={`/jobs/${job.id}/candidates`}
-                className="text-[#2D336B] font-medium hover:underline"
-              >
-                View All {job.shortlistedCount} Candidates
-              </Link>
-            </div>
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <label>Job Type:</label>
+            <select
+              className="border px-3 py-1 rounded"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Internship">Internship</option>
+            </select>
           </div>
-        ))}
+
+          <div className="flex items-center gap-3">
+            <label>Sort by Date:</label>
+            <select
+              className="border px-3 py-1 rounded"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+            >
+              <option value="desc">Latest First</option>
+              <option value="asc">Oldest First</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search by Job Title"
+              className="border px-3 py-1 rounded"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Jobs Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-sm">
+            <thead>
+              <tr className="bg-[#2D336B] text-white">
+                <th className="text-left px-6 py-3 rounded-tl-xl">Sr. No.</th>
+                <th className="text-left px-6 py-3">Job Title</th>
+                <th className="text-left px-6 py-3">Type</th>
+                <th className="text-left px-6 py-3">Location</th>
+                <th className="text-left px-6 py-3">Posted</th>
+                <th className="text-left px-6 py-3">Shortlisted</th>
+                <th className="text-left px-6 py-3 rounded-tr-xl">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredJobs.length > 0 ? (
+                filteredJobs.map((job, index) => (
+                  <tr key={job._id} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">{index + 1}</td>
+                    <td className="px-6 py-4">{job.jobPosition}</td>
+                    <td className="px-6 py-4">{job.type}</td>
+                    <td className="px-6 py-4">{job.location}</td>
+                    <td className="px-6 py-4">{new Date(job.postedDate).toLocaleDateString()}</td>
+                    <td className="px-6 py-4">{job.shortlistedCount || 0}</td>
+                    <td className="px-6 py-4">
+                      <Link
+                        to={`/jobs/${job._id}/candidates`}
+                        className="px-4 py-2 bg-[#2D336B] text-white rounded hover:bg-[#3f4a8a] transition"
+                      >
+                        View Shortlisted
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="text-center py-6">
+                    No jobs found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </main>
+
       <Footer />
     </div>
   );

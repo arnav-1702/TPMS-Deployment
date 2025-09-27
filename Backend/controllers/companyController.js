@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import Notification from "../models/notificationModel.js";
 import Job from "../models/jobModel.js"; 
+import JobApplicationSchema from "../models/JobApplicationSchema.js";
 dotenv.config();
 
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -309,6 +310,96 @@ export const getPendingJobs = async (req, res) => {
   }
 };
 
+
+
+
+export const getCompanyJobs = async (req, res) => {
+  try {
+    const companyId = req.user._id || req.user.id;
+    console.log("Fetching jobs for companyId:", companyId);
+
+    const jobs = await Job.find({ companyId }).sort({ postedDate: -1 });
+
+    const jobsWithShortlist = await Promise.all(
+      jobs.map(async (job) => {
+        const jobApp = await JobApplicationSchema.findOne({ jobId: job._id });
+        const shortlistedCount = jobApp?.candidates?.filter(c => c.status === "approved").length || 0;
+        return {
+          _id: job._id,
+          jobPosition: job.jobPosition,
+          type: job.type || job.workType,
+          location: job.location,
+          postedDate: job.postedDate,
+          shortlistedCount,
+        };
+      })
+    );
+
+    res.status(200).json(jobsWithShortlist);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch jobs", error: err.message });
+  }
+};
+
+// GET shortlisted candidates for a specific job
+export const getJobCandidates = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    // Get the job application and only include approved candidates
+    const jobApp = await JobApplicationSchema.findOne({ jobId })
+      .populate({
+        path: "candidates.candidateId",
+        select: "fullName email contactNumber yearsOfExperience",
+      });
+
+    if (!jobApp) {
+      return res.status(404).json({ message: "No candidates found" });
+    }
+
+    // Filter only approved candidates
+    const approvedCandidates = jobApp.candidates.filter(c => c.status === "approved");
+
+    res.status(200).json(approvedCandidates);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch candidates", error: err.message });
+  }
+};
+
+
+
+
+export const getCandidateDetails = async (req, res) => {
+  try {
+    const { candidateId } = req.params; // this is the candidateId from URL
+
+    // Find the JobApplication that contains this candidate
+    const jobApp = await JobApplicationSchema.findOne({
+      "candidates.candidateId": candidateId,
+    });
+
+    if (!jobApp) {
+      return res.status(404).json({ message: "Candidate not found in any job application" });
+    }
+
+    // Extract the candidate object from candidates array
+    const candidate = jobApp.candidates.find(
+      (c) => String(c.candidateId) === String(candidateId)
+    );
+
+    if (!candidate) {
+      return res.status(404).json({ message: "Candidate not found in job application" });
+    }
+
+    // Only return candidate object
+    res.status(200).json(candidate);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
 
 
 

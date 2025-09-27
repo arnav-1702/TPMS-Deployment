@@ -2,13 +2,14 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../Authentication/AuthProvider";
-import { Bell, Menu, X } from "lucide-react"; 
+import { Bell, Menu, X, Mail, Smartphone } from "lucide-react"; 
 import { logoutCandidateAPI, logoutCompanyAPI } from "../../services/api";
 
 const Navbar = () => {
   const { role, user, logout } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -82,6 +83,12 @@ const Navbar = () => {
         )}
 
         {/* Always visible */}
+        <button
+          onClick={() => setShowContactModal(true)}
+          className="text-[#2D336B] hover:text-blue-600 font-medium"
+        >
+          Contact Us
+        </button>
         <Link to="/services" className="text-[#2D336B] hover:text-blue-600">
           Services
         </Link>
@@ -143,12 +150,12 @@ const Navbar = () => {
                           </Link>
                         </li>
                         <li>
-                          <Link
-                            to="/contact"
-                            className="block px-4 py-3 hover:bg-gray-100"
+                          <button
+                            onClick={() => setShowContactModal(true)}
+                            className="w-full text-left px-4 py-3 hover:bg-gray-100"
                           >
                             Contact Us
-                          </Link>
+                          </button>
                         </li>
                       </>
                     )}
@@ -177,12 +184,12 @@ const Navbar = () => {
                           </Link>
                         </li>
                         <li>
-                          <Link
-                            to="/contact"
-                            className="block px-4 py-3 hover:bg-gray-100"
+                          <button
+                            onClick={() => setShowContactModal(true)}
+                            className="w-full text-left px-4 py-3 hover:bg-gray-100"
                           >
                             Contact Us
-                          </Link>
+                          </button>
                         </li>
                         <li>
                           <Link
@@ -274,6 +281,9 @@ const Navbar = () => {
 
             {/* Always visible */}
             <li>
+              <button onClick={() => setShowContactModal(true)}>Contact Us</button>
+            </li>
+            <li>
               <Link to="/services" onClick={() => setMobileNav(false)}>
                 Services
               </Link>
@@ -286,6 +296,43 @@ const Navbar = () => {
           </ul>
         </div>
       )}
+
+      {/* Contact Modal */}
+      {/* Contact Modal */}
+{showContactModal && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-80 relative">
+      <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+      <button
+        onClick={() => setShowContactModal(false)}
+        className="absolute top-2 right-3 text-gray-500 hover:text-gray-800 font-bold"
+      >
+        ✕
+      </button>
+      <div className="flex flex-col space-y-3">
+  <a
+    href="https://wa.me/919960587841"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+  >
+    <Smartphone className="w-5 h-5" /> WhatsApp
+  </a>
+
+  <a
+    href="https://mail.google.com/mail/?view=cm&fs=1&to=talentpoolmanpowerservices@gmail.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+  >
+    <Mail className="w-5 h-5" /> Email
+  </a>
+</div>
+
+    </div>
+  </div>
+)}
+
     </header>
   );
 };
