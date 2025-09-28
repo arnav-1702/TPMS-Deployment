@@ -27,7 +27,7 @@ app.use(cookieParser());
 // --- THIS IS THE CRITICAL CHANGE ---
 // Explicitly set the origin to your live frontend URL
 app.use(cors({
-  origin: 'https://your-app-name.onrender.com', // <-- PASTE YOUR LIVE URL HERE
+  origin: 'https://tpms-live.onrender.com', // <-- PASTE YOUR LIVE URL HERE
   credentials: true
 }));
 
