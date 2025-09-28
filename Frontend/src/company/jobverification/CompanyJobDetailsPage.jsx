@@ -16,7 +16,7 @@ const CompanyJobDetailsPage = () => {
     const fetchJob = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/job/getjob/${id}`,
+          `/job/getjob/${id}`,
           { withCredentials: true }
         );
         setJob(response.data);
@@ -57,7 +57,7 @@ const CompanyJobDetailsPage = () => {
   const toggleActive = async () => {
     try {
       await axios.put(
-        `http://localhost:8000/job/${id}`,
+        `/job/${id}`,
         {},
         { withCredentials: true }
       );
@@ -73,7 +73,7 @@ const CompanyJobDetailsPage = () => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
 
     try {
-      await axios.delete(`http://localhost:8000/job/delete/${id}`, {
+      await axios.delete(`/job/delete/${id}`, {
         withCredentials: true,
       });
       alert("Job deleted successfully");

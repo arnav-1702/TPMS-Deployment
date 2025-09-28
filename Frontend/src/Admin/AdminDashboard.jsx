@@ -24,22 +24,22 @@ export default function AdminDashboard() {
           monthlyJobsRes,
           monthlyApplicationsRes,
         ] = await Promise.all([
-          axios.get("http://localhost:8000/admin/gettotalcandidates", {
+          axios.get("/admin/gettotalcandidates", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("http://localhost:8000/admin/gettotalcompanies", {
+          axios.get("/admin/gettotalcompanies", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("http://localhost:8000/admin/getpendingcompanies", {
+          axios.get("/admin/getpendingcompanies", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("http://localhost:8000/admin/getpendingjobs", {
+          axios.get("/admin/getpendingjobs", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("http://localhost:8000/admin/monthlyjobpostings", {
+          axios.get("/admin/monthlyjobpostings", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("http://localhost:8000/admin/monthlyjobapplications", {
+          axios.get("/admin/monthlyjobapplications", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
         ]);
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:8000/admin/logout", null, {
+      await axios.post("/admin/logout", null, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       localStorage.removeItem("token");

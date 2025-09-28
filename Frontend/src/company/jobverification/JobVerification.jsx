@@ -23,8 +23,8 @@ const JobVerification = () => {
       };
 
       const [verificationRes, activeRes] = await Promise.all([
-        axios.get("http://localhost:8000/job/verification", { headers }),
-        axios.get("http://localhost:8000/job/active", { headers }),
+        axios.get("/job/verification", { headers }),
+        axios.get("/job/active", { headers }),
       ]);
 
       setVerificationRequests(verificationRes.data.jobs || []);

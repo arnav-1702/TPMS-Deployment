@@ -29,7 +29,7 @@ export default function FindJob() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/job/getjobs", {
+        const response = await axios.get("/job/getjobs", {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         });

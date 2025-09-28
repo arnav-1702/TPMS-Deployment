@@ -21,7 +21,7 @@ export default function ActiveJob() {
     const fetchJobs = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/admin/getactivejobs",
+          "/admin/getactivejobs",
           {
             headers: { "Content-Type": "application/json" },
             withCredentials: true,

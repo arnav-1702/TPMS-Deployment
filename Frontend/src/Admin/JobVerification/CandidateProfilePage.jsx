@@ -18,7 +18,7 @@ export default function CandidateProfilePage() {
     const fetchCandidate = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/admin/candidate/${candidateId}`,
+          `/admin/candidate/${candidateId}`,
           { headers }
         );
         setCandidate(res.data);
@@ -49,7 +49,7 @@ export default function CandidateProfilePage() {
   const handleReject = async () => {
     try {
       await axios.post(
-        `http://localhost:8000/admin/candidate/${candidateId}/reject`,
+        `/admin/candidate/${candidateId}/reject`,
         {},
         { headers }
       );

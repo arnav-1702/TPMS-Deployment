@@ -10,7 +10,7 @@ export default function SuperAdminDashboard() {
   // 🔹 Fetch all jobs
   const fetchJobs = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/admin/jobs", {
+      const res = await axios.get("/admin/jobs", {
         withCredentials: true,
       });
       setJobs(res.data.jobs);
@@ -22,7 +22,7 @@ export default function SuperAdminDashboard() {
   // 🔹 Fetch all companies
   const fetchCompanies = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/company/all", {
+      const res = await axios.get("/company/all", {
         withCredentials: true,
       });
       setCompanies(res.data.companies || []);
@@ -34,7 +34,7 @@ export default function SuperAdminDashboard() {
   // 🔹 Fetch all candidates & applications
   const fetchApplications = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/candidate/all", {
+      const res = await axios.get("/candidate/all", {
         withCredentials: true,
       });
       const apps = res.data.candidates.flatMap((c) =>
@@ -54,7 +54,7 @@ export default function SuperAdminDashboard() {
   const handleJobValidation = async (jobId, status) => {
     try {
       const res = await axios.post(
-        "http://localhost:8000/admin/validate-job",
+        "/admin/validate-job",
         { jobId, status },
         { withCredentials: true }
       );
@@ -69,7 +69,7 @@ export default function SuperAdminDashboard() {
   const handleCompanyApproval = async (companyId, status) => {
     try {
       const res = await axios.post(
-        "http://localhost:8000/admin/approve-company",
+        "/admin/approve-company",
         { companyId, status },
         { withCredentials: true }
       );
@@ -84,7 +84,7 @@ export default function SuperAdminDashboard() {
   const handleApplicationReview = async (candidateId, jobId, status) => {
     try {
       const res = await axios.post(
-        "http://localhost:8000/admin/review-application",
+        "/admin/review-application",
         { candidateId, jobId, status },
         { withCredentials: true }
       );

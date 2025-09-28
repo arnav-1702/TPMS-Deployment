@@ -23,8 +23,8 @@ const CompanyVerification = () => {
         };
 
         const [verificationRes, verifiedRes] = await Promise.allSettled([
-          axios.get("http://localhost:8000/admin/company/verification", { headers }),
-          axios.get("http://localhost:8000/admin/company/verified", { headers }),
+          axios.get("/admin/company/verification", { headers }),
+          axios.get("/admin/company/verified", { headers }),
         ]);
 
         if (verificationRes.status === "fulfilled") {

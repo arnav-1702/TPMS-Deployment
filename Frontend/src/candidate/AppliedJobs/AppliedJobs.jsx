@@ -15,7 +15,7 @@ const AppliedJobs = () => {
       if (!candidate?._id) return;
 
       const res = await axios.get(
-        "http://localhost:8000/candidate/appliedjobs",
+        "/candidate/appliedjobs",
         { withCredentials: true }
       );
 

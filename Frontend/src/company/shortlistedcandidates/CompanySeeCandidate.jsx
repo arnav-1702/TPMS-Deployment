@@ -17,7 +17,7 @@ export default function CompanySeeCandidate() {
     const fetchCandidate = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/company/candidate/${jobId}/${candidateId}`,
+          `/company/candidate/${jobId}/${candidateId}`,
           { headers }
         );
         setCandidate(res.data);

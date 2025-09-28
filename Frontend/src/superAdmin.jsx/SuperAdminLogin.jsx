@@ -15,7 +15,7 @@ export default function SuperAdminLogin() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:8000/superadmin/login",
+        "/superadmin/login",
         loginData,
         { withCredentials: true }
       );
@@ -30,7 +30,7 @@ export default function SuperAdminLogin() {
   const handleLogout = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:8000/superadmin/logout",
+        "/superadmin/logout",
         {},
         { withCredentials: true }
       );
@@ -46,7 +46,7 @@ export default function SuperAdminLogin() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:8000/superadmin/create-admin",
+        "/superadmin/create-admin",
         adminData,
         { withCredentials: true }
       );
@@ -60,7 +60,7 @@ export default function SuperAdminLogin() {
   // ================= DASHBOARD DATA =================
   const fetchJobs = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/admin/get-all-jobs", {
+      const res = await axios.get("/admin/get-all-jobs", {
         withCredentials: true,
       });
       setJobs(res.data.jobs || []);
@@ -73,7 +73,7 @@ export default function SuperAdminLogin() {
   const handleJobValidation = async (jobId, status) => {
     try {
       const res = await axios.post(
-        "http://localhost:8000/admin/validate-job",
+        "/admin/validate-job",
         { jobId, status },
         { withCredentials: true }
       );

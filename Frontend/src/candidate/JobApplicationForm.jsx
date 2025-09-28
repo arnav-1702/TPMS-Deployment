@@ -46,7 +46,7 @@ export default function JobApplicationForm() {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/job/getjob/${jobId}`);
+        const res = await axios.get(`/job/getjob/${jobId}`);
         setJobDetails(res.data);
       } catch (err) {
         console.error("Failed to fetch job details", err);
@@ -81,7 +81,7 @@ export default function JobApplicationForm() {
       }
 
       await axios.post(
-        `http://localhost:8000/candidateapplication/job/${jobId}/apply`,
+        `/candidateapplication/job/${jobId}/apply`,
         data,
         {
           headers: {

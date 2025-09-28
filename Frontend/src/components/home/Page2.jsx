@@ -56,7 +56,7 @@ const Page2 = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/job/getjobs"); // change URL if needed
+        const res = await axios.get("/job/getjobs"); // change URL if needed
         setJobs(res.data);
       } catch (error) {
         console.error("Error fetching jobs:", error);

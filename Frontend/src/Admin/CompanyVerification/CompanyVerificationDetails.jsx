@@ -19,7 +19,7 @@ const CompanyVerificationDetails = () => {
   if (!company && id) {
     const fetchCompanyDetails = async () => {
       try {
-        const url = `http://localhost:8000/admin/company/verification/${id}`; // same as pending API
+        const url = `/admin/company/verification/${id}`; // same as pending API
         const res = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
@@ -41,7 +41,7 @@ const CompanyVerificationDetails = () => {
   const approveCompany = async () => {
     try {
       await axios.put(
-        `http://localhost:8000/admin/company/approve/${company._id}`,
+        `/admin/company/approve/${company._id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
@@ -55,7 +55,7 @@ const CompanyVerificationDetails = () => {
   const rejectCompany = async () => {
     try {
       await axios.delete(
-        `http://localhost:8000/admin/company/reject/${company._id}`,
+        `/admin/company/reject/${company._id}`,
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
       alert("Company rejected successfully!");
@@ -68,7 +68,7 @@ const CompanyVerificationDetails = () => {
   const disapproveCompany = async () => {
     try {
       await axios.put(
-        `http://localhost:8000/admin/company/disapprove/${company._id}`,
+        `/admin/company/disapprove/${company._id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );

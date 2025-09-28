@@ -6,7 +6,7 @@ const JobCards = () => {
 
   useEffect(() => {
   axios
-    .get("http://localhost:8000/job/getjobs", {
+    .get("/job/getjobs", {
       withCredentials: true, // 👈 send cookies automatically
     })
     .then((res) => setJobs(res.data))

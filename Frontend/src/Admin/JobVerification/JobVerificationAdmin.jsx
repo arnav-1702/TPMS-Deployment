@@ -26,8 +26,8 @@ const JobVerificationAdmin = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         const [pendingRes, verifiedRes] = await Promise.allSettled([
-          axios.get("http://localhost:8000/job/admin/job/verification", { headers }),
-          axios.get("http://localhost:8000/job/admin/job/verified", { headers }),
+          axios.get("/job/admin/job/verification", { headers }),
+          axios.get("/job/admin/job/verified", { headers }),
         ]);
 
         if (pendingRes.status === "fulfilled") {

@@ -19,7 +19,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:8000/admin/login", {
+      const res = await axios.post("/admin/login", {
         role,
         email,
         password,

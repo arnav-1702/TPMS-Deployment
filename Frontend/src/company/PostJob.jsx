@@ -69,7 +69,7 @@ export const PostJob = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/job/post",
+        "/job/post",
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },

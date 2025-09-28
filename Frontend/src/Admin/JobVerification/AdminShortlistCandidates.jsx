@@ -28,13 +28,13 @@ export default function AdminShortlistCandidates() {
 
         // Fetch job details
         const jobRes = await axios.get(
-          `http://localhost:8000/admin/job/${jobId}`,
+          `/admin/job/${jobId}`,
           { headers }
         );
 
         // Fetch candidates for this job
         const candidatesRes = await axios.get(
-          `http://localhost:8000/admin/job/${jobId}/candidates`,
+          `/admin/job/${jobId}/candidates`,
           { headers }
         );
 

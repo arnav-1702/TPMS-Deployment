@@ -21,7 +21,7 @@ const JobVerificationAdminDetails = () => {
     try {
       setLoading(true);
       await axios.put(
-        `http://localhost:8000/job/admin/approve/${job._id}`,
+        `/job/admin/approve/${job._id}`,
         {},
         { headers }
       );
@@ -38,7 +38,7 @@ const JobVerificationAdminDetails = () => {
     try {
       setLoading(true);
       await axios.put(
-        `http://localhost:8000/job/admin/reject/${job._id}`,
+        `/job/admin/reject/${job._id}`,
         {},
         { headers }
       );
@@ -55,7 +55,7 @@ const JobVerificationAdminDetails = () => {
     try {
       setLoading(true);
       await axios.delete(
-        `http://localhost:8000/job/admin/delete/${job._id}`,
+        `/job/admin/delete/${job._id}`,
         { headers }
       );
       alert("Job deleted successfully!");

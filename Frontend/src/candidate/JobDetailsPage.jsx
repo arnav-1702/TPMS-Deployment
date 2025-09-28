@@ -17,7 +17,7 @@ const JobDetailsPage = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/job/getjob/${id}`, {
+        const response = await axios.get(`/job/getjob/${id}`, {
           withCredentials: true,
         });
         setJob(response.data);

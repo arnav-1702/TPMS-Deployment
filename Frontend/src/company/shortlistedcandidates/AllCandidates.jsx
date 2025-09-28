@@ -16,7 +16,7 @@ export default function AllCandidates() {
     const fetchCandidates = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/company/jobs/${jobId}/candidates`,
+          `/company/jobs/${jobId}/candidates`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
