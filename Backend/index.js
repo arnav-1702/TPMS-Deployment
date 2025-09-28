@@ -23,7 +23,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// --- THIS IS THE CRITICAL CHANGE ---
+// Explicitly set the origin to your live frontend URL
 app.use(cors({
+  origin: 'https://your-app-name.onrender.com', // <-- PASTE YOUR LIVE URL HERE
   credentials: true
 }));
 
@@ -36,14 +40,12 @@ app.use('/superadmin', superAdminRoutes);
 app.use('/candidateapplication', candidatesApplicationRoutes);
 app.use("/api/auth", authRoutes);
 
-// --- Deployment: Static File Serving ---
+// Deployment: Static File Serving
 if (process.env.NODE_ENV === 'production') {
-  // Look for the 'dist' folder created by Vite
-  app.use(express.static(path.join(__dirname, '../Frontend/dist'))); // <-- CHANGED from 'build' to 'dist'
+  app.use(express.static(path.join(__dirname, '../Frontend/dist')));
 
   app.get('*', (req, res) => {
-    // Point to the index.html inside the 'dist' folder
-    res.sendFile(path.resolve(__dirname, '../Frontend', 'dist', 'index.html')); // <-- CHANGED from 'build' to 'dist'
+    res.sendFile(path.resolve(__dirname, '../Frontend', 'dist', 'index.html'));
   });
 }
 
