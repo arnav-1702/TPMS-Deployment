@@ -38,12 +38,12 @@ app.use("/api/auth", authRoutes);
 
 // --- Deployment: Static File Serving ---
 if (process.env.NODE_ENV === 'production') {
-  // Use 'Frontend' with a capital F to match your folder name
-  app.use(express.static(path.join(__dirname, '../Frontend/build'))); // <-- THIS LINE WAS CHANGED
+  // Look for the 'dist' folder created by Vite
+  app.use(express.static(path.join(__dirname, '../Frontend/dist'))); // <-- CHANGED from 'build' to 'dist'
 
   app.get('*', (req, res) => {
-    // Use 'Frontend' with a capital F here as well
-    res.sendFile(path.resolve(__dirname, '../Frontend', 'build', 'index.html')); // <-- THIS LINE WAS CHANGED
+    // Point to the index.html inside the 'dist' folder
+    res.sendFile(path.resolve(__dirname, '../Frontend', 'dist', 'index.html')); // <-- CHANGED from 'build' to 'dist'
   });
 }
 
@@ -53,3 +53,4 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
