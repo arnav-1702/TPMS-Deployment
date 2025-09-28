@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Page1 from './page1.jsx'
-import Page2 from './page2.jsx'
+import Page1 from './Page1.jsx'
+import Page2 from './Page2.jsx'
 import Footer from './Footer.jsx'
 
 import Page3 from './Page3.jsx'
