@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
 import { OAuth2Client } from "google-auth-library";
-// import Job from "../models/jobModel.js";
+
 dotenv.config();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -16,11 +16,9 @@ const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
-// Email transporter
+// Email transporter (Gmail)
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // true for 465, false for 587
+  service: "gmail", // ✅ just specify service
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -158,17 +156,14 @@ export const loginCandidate = async (req, res) => {
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    // ✅ include role inside JWT payload
     const token = jwt.sign(
       { email, id: candidate._id, role: candidate.role || "candidate" },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // ✅ send as HttpOnly cookie
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
 
-    // ✅ also send role in JSON response
     res.status(200).json({
       message: "Login successful",
       token,
@@ -176,22 +171,20 @@ export const loginCandidate = async (req, res) => {
         _id: candidate._id,
         name: candidate.name,
         email: candidate.email,
-        role: candidate.role || "candidate", // always included
+        role: candidate.role || "candidate",
         isProfileComplete: candidate.isProfileComplete,
         applications: candidate.applications,
-        // add other fields as needed
       },
     });
     console.log("Login successful:", {
-  status: 200,
-  token,
-  role: candidate.role || "candidate",
-});
+      status: 200,
+      token,
+      role: candidate.role || "candidate",
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 
 // Google Signin
 export const googleSignin = async (req, res) => {
@@ -240,8 +233,8 @@ export const googleSignin = async (req, res) => {
 // Logout
 export const logoutCandidate = async (req, res) => {
   try {
-   res.clearCookie("token", { httpOnly: true, sameSite: "lax" });
-  res.status(200).json({ message: "Logged out successfully" });
+    res.clearCookie("token", { httpOnly: true, sameSite: "lax" });
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -322,8 +315,6 @@ export const applyJob = async (req, res) => {
     if (!job || !job.isPublished)
       return res.status(403).json({ message: "Invalid job or not published" });
 
-    // ✅ Removed isProfileComplete check
-
     const alreadyApplied = candidate.applications.some(
       (app) => app.jobId.toString() === jobId
     );
@@ -349,7 +340,6 @@ export const applyJob = async (req, res) => {
   }
 };
 
-
 // ================= NOTIFICATIONS ================= //
 
 export const getCandidateNotifications = async (req, res) => {
@@ -370,22 +360,20 @@ export const getCandidateNotifications = async (req, res) => {
 };
 
 // Get all applied jobs for a candidate
-// Get all applied jobs for a candidate
-// Get all applied jobs for a candidate
 export const getAppliedJobs = async (req, res) => {
   try {
     const candidateId = req.user.id;
 
     const candidate = await Candidate.findById(candidateId).populate({
-      path: "applications.jobId", // populate job details
-      match: { active: true, isPublished: true, isValid: true }, // ✅ active + published + valid
+      path: "applications.jobId",
+      match: { active: true, isPublished: true, isValid: true },
       select: `
         companyName companyLogo jobPosition domain experienceRequired workType salaryBudget 
         location isPublished isValid jobDescription skills keyQualities postedDate openings companyId
       `,
       populate: {
         path: "companyId",
-        select: "companyName description careerGrowth culture", // include company details
+        select: "companyName description careerGrowth culture",
       },
     });
 
@@ -393,10 +381,9 @@ export const getAppliedJobs = async (req, res) => {
       return res.status(404).json({ message: "Candidate not found" });
     }
 
-    // Filter out null jobs (inactive/unpublished/invalid removed by match)
     const appliedJobs = candidate.applications
-      .filter(app => app.jobId !== null)
-      .map(app => ({
+      .filter((app) => app.jobId !== null)
+      .map((app) => ({
         job: app.jobId,
         status: app.status,
       }));
