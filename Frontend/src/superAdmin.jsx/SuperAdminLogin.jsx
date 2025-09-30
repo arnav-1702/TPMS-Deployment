@@ -46,7 +46,7 @@ export default function SuperAdminLogin() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "/superadmin/create-admin",
+        "https://tpms-live.onrender.com/superadmin/create-admin",
         adminData,
         { withCredentials: true }
       );

@@ -19,7 +19,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("/admin/login", {
+      const res = await axios.post("https://tpms-live.onrender.com/admin/login", {
         role,
         email,
         password,

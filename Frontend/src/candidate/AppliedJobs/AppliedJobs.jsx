@@ -15,7 +15,7 @@ const AppliedJobs = () => {
       if (!candidate?._id) return;
 
       const res = await axios.get(
-        "/candidate/appliedjobs",
+        "https://tpms-live.onrender.com/candidate/appliedjobs",
         { withCredentials: true }
       );
 

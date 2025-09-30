@@ -21,7 +21,7 @@ const JobVerificationAdminDetails = () => {
     try {
       setLoading(true);
       await axios.put(
-        `/job/admin/approve/${job._id}`,
+        `https://tpms-live.onrender.com/job/admin/approve/${job._id}`,
         {},
         { headers }
       );
@@ -38,7 +38,7 @@ const JobVerificationAdminDetails = () => {
     try {
       setLoading(true);
       await axios.put(
-        `/job/admin/reject/${job._id}`,
+        `https://tpms-live.onrender.com/job/admin/reject/${job._id}`,
         {},
         { headers }
       );
@@ -55,7 +55,7 @@ const JobVerificationAdminDetails = () => {
     try {
       setLoading(true);
       await axios.delete(
-        `/job/admin/delete/${job._id}`,
+        `https://tpms-live.onrender.com/job/admin/delete/${job._id}`,
         { headers }
       );
       alert("Job deleted successfully!");

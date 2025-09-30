@@ -23,8 +23,8 @@ const JobVerification = () => {
       };
 
       const [verificationRes, activeRes] = await Promise.all([
-        axios.get("/job/verification", { headers }),
-        axios.get("/job/active", { headers }),
+        axios.get("https://tpms-live.onrender.com/job/verification", { headers }),
+        axios.get("https://tpms-live.onrender.com/job/active", { headers }),
       ]);
 
       setVerificationRequests(verificationRes.data.jobs || []);

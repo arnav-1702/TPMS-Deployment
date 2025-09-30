@@ -17,7 +17,7 @@ export default function CompanySeeCandidate() {
     const fetchCandidate = async () => {
       try {
         const res = await axios.get(
-          `/company/candidate/${jobId}/${candidateId}`,
+          `https://tpms-live.onrender.com/company/candidate/${jobId}/${candidateId}`,
           { headers }
         );
         setCandidate(res.data);

@@ -69,7 +69,7 @@ export const PostJob = () => {
 
     try {
       const response = await axios.post(
-        "/job/post",
+        "https://tpms-live.onrender.com/job/post",
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },

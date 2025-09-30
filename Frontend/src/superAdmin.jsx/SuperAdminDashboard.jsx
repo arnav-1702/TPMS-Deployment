@@ -69,7 +69,7 @@ export default function SuperAdminDashboard() {
   const handleCompanyApproval = async (companyId, status) => {
     try {
       const res = await axios.post(
-        "/admin/approve-company",
+        "https://tpms-live.onrender.com/admin/approve-company",
         { companyId, status },
         { withCredentials: true }
       );

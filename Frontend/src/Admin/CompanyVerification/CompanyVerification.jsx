@@ -23,8 +23,8 @@ const CompanyVerification = () => {
         };
 
         const [verificationRes, verifiedRes] = await Promise.allSettled([
-          axios.get("/admin/company/verification", { headers }),
-          axios.get("/admin/company/verified", { headers }),
+          axios.get("https://tpms-live.onrender.com/admin/company/verification", { headers }),
+          axios.get("https://tpms-live.onrender.com/admin/company/verified", { headers }),
         ]);
 
         if (verificationRes.status === "fulfilled") {

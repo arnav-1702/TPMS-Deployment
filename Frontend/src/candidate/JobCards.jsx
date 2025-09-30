@@ -6,7 +6,7 @@ const JobCards = () => {
 
   useEffect(() => {
   axios
-    .get("/job/getjobs", {
+    .get("https://tpms-live.onrender.com/job/getjobs", {
       withCredentials: true, // 👈 send cookies automatically
     })
     .then((res) => setJobs(res.data))

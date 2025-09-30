@@ -28,13 +28,13 @@ export default function AdminShortlistCandidates() {
 
         // Fetch job details
         const jobRes = await axios.get(
-          `/admin/job/${jobId}`,
+          `https://tpms-live.onrender.com/admin/job/${jobId}`,
           { headers }
         );
 
         // Fetch candidates for this job
         const candidatesRes = await axios.get(
-          `/admin/job/${jobId}/candidates`,
+          `https://tpms-live.onrender.com/admin/job/${jobId}/candidates`,
           { headers }
         );
 

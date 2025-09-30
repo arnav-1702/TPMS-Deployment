@@ -56,7 +56,7 @@ const Page2 = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get("/job/getjobs"); // change URL if needed
+        const res = await axios.get("https://tpms-live.onrender.com/job/getjobs"); // change URL if needed
         setJobs(res.data);
       } catch (error) {
         console.error("Error fetching jobs:", error);

@@ -21,7 +21,7 @@ export default function ActiveJob() {
     const fetchJobs = async () => {
       try {
         const response = await axios.get(
-          "/admin/getactivejobs",
+          "https://tpms-live.onrender.com/admin/getactivejobs",
           {
             headers: { "Content-Type": "application/json" },
             withCredentials: true,

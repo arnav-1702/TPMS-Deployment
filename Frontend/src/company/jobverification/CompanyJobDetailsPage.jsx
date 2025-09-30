@@ -16,7 +16,7 @@ const CompanyJobDetailsPage = () => {
     const fetchJob = async () => {
       try {
         const response = await axios.get(
-          `/job/getjob/${id}`,
+          `https://tpms-live.onrender.com/job/getjob/${id}`,
           { withCredentials: true }
         );
         setJob(response.data);
@@ -57,7 +57,7 @@ const CompanyJobDetailsPage = () => {
   const toggleActive = async () => {
     try {
       await axios.put(
-        `/job/${id}`,
+        `https://tpms-live.onrender.com/job/${id}`,
         {},
         { withCredentials: true }
       );
@@ -73,7 +73,7 @@ const CompanyJobDetailsPage = () => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
 
     try {
-      await axios.delete(`/job/delete/${id}`, {
+      await axios.delete(`https://tpms-live.onrender.com/job/delete/${id}`, {
         withCredentials: true,
       });
       alert("Job deleted successfully");

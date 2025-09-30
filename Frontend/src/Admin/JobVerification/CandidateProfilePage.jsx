@@ -18,7 +18,7 @@ export default function CandidateProfilePage() {
     const fetchCandidate = async () => {
       try {
         const res = await axios.get(
-          `/admin/candidate/${candidateId}`,
+          `https://tpms-live.onrender.com/admin/candidate/${candidateId}`,
           { headers }
         );
         setCandidate(res.data);
@@ -49,7 +49,7 @@ export default function CandidateProfilePage() {
   const handleReject = async () => {
     try {
       await axios.post(
-        `/admin/candidate/${candidateId}/reject`,
+        `https://tpms-live.onrender.com/admin/candidate/${candidateId}/reject`,
         {},
         { headers }
       );

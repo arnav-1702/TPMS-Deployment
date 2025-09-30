@@ -16,7 +16,7 @@ export default function AllCandidates() {
     const fetchCandidates = async () => {
       try {
         const res = await axios.get(
-          `/company/jobs/${jobId}/candidates`,
+          `https://tpms-live.onrender.com/company/jobs/${jobId}/candidates`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

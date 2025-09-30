@@ -24,22 +24,22 @@ export default function AdminDashboard() {
           monthlyJobsRes,
           monthlyApplicationsRes,
         ] = await Promise.all([
-          axios.get("/admin/gettotalcandidates", {
+          axios.get("https://tpms-live.onrender.com/admin/gettotalcandidates", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("/admin/gettotalcompanies", {
+          axios.get("https://tpms-live.onrender.com/admin/gettotalcompanies", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("/admin/getpendingcompanies", {
+          axios.get("https://tpms-live.onrender.com/admin/getpendingcompanies", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("/admin/getpendingjobs", {
+          axios.get("https://tpms-live.onrender.com/admin/getpendingjobs", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("/admin/monthlyjobpostings", {
+          axios.get("https://tpms-live.onrender.com/admin/monthlyjobpostings", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("/admin/monthlyjobapplications", {
+          axios.get("https://tpms-live.onrender.com/admin/monthlyjobapplications", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
         ]);
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
-      await axios.post("/admin/logout", null, {
+      await axios.post("https://tpms-live.onrender.com/admin/logout", null, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       localStorage.removeItem("token");
