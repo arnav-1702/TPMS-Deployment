@@ -18,12 +18,10 @@ const generateOTP = () =>
 
 // Email transporter (Gmail)
 const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587, // use 465 if you want SSL
-  secure: false, // true for 465, false for 587
+  service: "gmail", // ✅ just specify service
   auth: {
-    user: process.env.BREVO_USER, // set in Render env vars
-    pass: process.env.BREVO_PASS, // set in Render env vars
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -33,42 +31,44 @@ const transporter = nodemailer.createTransport({
 export const signupCandidate = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    console.log("[SIGNUP] Request received for email:", email);
+    console.log("📥 Signup request received:", { name, email });
 
     if (!validateEmail(email)) {
-      console.log("[SIGNUP] Invalid email format:", email);
+      console.warn("⚠ Invalid email attempted:", email);
       return res.status(400).json({ message: "Invalid email address" });
     }
 
     const existingCandidate = await Candidate.findOne({ email });
     if (existingCandidate) {
-      console.log("[SIGNUP] Candidate already exists:", email);
+      console.warn("⚠ Signup attempt with existing email:", email);
       return res.status(400).json({ message: "Candidate already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const otp = generateOTP();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 min expiry
-    console.log("[SIGNUP] Generated OTP:", otp, "Expiry:", otpExpiry);
+    console.log("🔒 Password hashed successfully for:", email);
 
-    // Send OTP via Brevo
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 3 * 60 * 1000); // 3 min
+    console.log("🔑 Generated OTP:", otp, "Expiry:", otpExpiry);
+
+    // Attempt to send email
     try {
-      const info = await transporter.sendMail({
-        from: `"Recruitment Platform" <${process.env.BREVO_USER}>`,
+      console.log("📧 Sending OTP email via:", process.env.EMAIL_USER);
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
         to: email,
         subject: "Verify your email",
         text: `Your OTP is ${otp}. It will expire in 10 minutes.`,
       });
-      console.log("[SIGNUP] OTP email sent:", info.response);
+      console.log("✅ OTP email successfully sent to:", email);
     } catch (err) {
-      console.error("[SIGNUP] Error sending OTP email:", err.message);
+      console.error("❌ OTP email sending failed:", err);
       return res.status(400).json({
         message: "Could not send OTP. Invalid or unreachable email.",
-        error: err.message,
       });
     }
 
-    // Save candidate (unverified)
+    // Save candidate
     await Candidate.create({
       name,
       email,
@@ -79,13 +79,15 @@ export const signupCandidate = async (req, res) => {
       authProvider: "local",
       role: "candidate",
     });
-    console.log("[SIGNUP] Candidate saved (unverified):", email);
+    console.log("💾 Candidate saved in DB (unverified):", email);
 
-    res.status(201).json({
-      message: "OTP sent to email. Please verify to activate account.",
-    });
+    res
+      .status(201)
+      .json({
+        message: "OTP sent to email. Please verify to activate account.",
+      });
   } catch (error) {
-    console.error("[SIGNUP] Server error:", error.message);
+    console.error("🔥 Signup server error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -94,21 +96,23 @@ export const signupCandidate = async (req, res) => {
 export const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    console.log("[VERIFY] Request received for email:", email, "OTP:", otp);
+    console.log("📥 OTP verification attempt:", { email, otp });
 
     const candidate = await Candidate.findOne({ email });
     if (!candidate) {
-      console.log("[VERIFY] Candidate not found:", email);
+      console.warn("⚠ OTP verification failed. Candidate not found:", email);
       return res.status(404).json({ message: "Candidate not found" });
     }
 
     if (!candidate.otp || !candidate.otpExpiry) {
-      console.log("[VERIFY] No OTP pending for:", email);
-      return res.status(400).json({ message: "No OTP pending for this account." });
+      console.warn("⚠ No OTP pending for account:", email);
+      return res
+        .status(400)
+        .json({ message: "No OTP pending for this account." });
     }
 
     if (candidate.otp !== otp || candidate.otpExpiry < Date.now()) {
-      console.log("[VERIFY] Invalid or expired OTP for:", email);
+      console.warn("⚠ Invalid or expired OTP for:", email);
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
@@ -116,7 +120,7 @@ export const verifyOtp = async (req, res) => {
     candidate.otp = null;
     candidate.otpExpiry = null;
     await candidate.save();
-    console.log("[VERIFY] Candidate verified successfully:", email);
+    console.log("✅ Candidate verified and saved:", email);
 
     await Notification.create({
       recipientId: candidate._id,
@@ -124,11 +128,13 @@ export const verifyOtp = async (req, res) => {
       message: "Welcome to the recruitment platform!",
       role: "candidate",
     });
-    console.log("[VERIFY] Notification created for:", email);
+    console.log("🔔 Notification created for candidate:", email);
 
-    res.status(200).json({ message: "Email verified successfully. You can now login." });
+    res
+      .status(200)
+      .json({ message: "Email verified successfully. You can now login." });
   } catch (error) {
-    console.error("[VERIFY] Server error:", error.message);
+    console.error("🔥 OTP verification server error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
