@@ -1,5 +1,5 @@
 import React from 'react'
-
+import NileshImg from "../../../assets/Nilesh.jpg"
 const Page3 = () => {
   return (
     <div className="bg-gray-50">
@@ -13,7 +13,7 @@ const Page3 = () => {
               {/* Profile Image */}
               <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden flex-shrink-0 shadow-lg">
                 <img
-                  src="/assets/Nilesh.jpg" // Replace with your image URL
+                  src={NileshImg} // Replace with your image URL
                   alt="Nilesh Pandit"
                   className="w-full h-full object-cover"
                 />
