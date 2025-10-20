@@ -35,7 +35,7 @@ export default function CandidateProfilePage() {
   const handleApprove = async () => {
     try {
       await axios.post(
-        `http://localhost:8000/admin/candidate/${candidateId}/approve`,
+        `https://tpms-live.onrender.com/admin/candidate/${candidateId}/approve`,
         {},
         { headers }
       );
