@@ -29,11 +29,13 @@ export const SignUpCompany = () => {
     try {
       const res = await signupCompanyAPI(formData);
 
-      // store email for OTP verification
+      // store company info (optional)
       localStorage.setItem("company", JSON.stringify({ email: formData.email }));
 
       alert(res.data.message);
-      navigate("/verify-company-otp");
+
+      // Redirect directly to company pending page
+      navigate("/company-pending");
     } catch (error) {
       alert(error.response?.data?.message || "Something went wrong");
     }
@@ -54,15 +56,25 @@ export const SignUpCompany = () => {
               <label htmlFor="companyName" className="block text-base font-medium text-gray-800 mb-2">
                 Company Name
               </label>
-              <input id="companyName" type="text" value={formData.companyName} onChange={handleChange}
-                className="w-full border border-gray-400 rounded-md px-3 py-2" />
+              <input
+                id="companyName"
+                type="text"
+                value={formData.companyName}
+                onChange={handleChange}
+                className="w-full border border-gray-400 rounded-md px-3 py-2"
+              />
             </div>
             <div>
               <label htmlFor="companyDomain" className="block text-base font-medium text-gray-800 mb-2">
                 Company Domain
               </label>
-              <input id="companyDomain" type="text" value={formData.companyDomain} onChange={handleChange}
-                className="w-full border border-gray-400 rounded-md px-3 py-2" />
+              <input
+                id="companyDomain"
+                type="text"
+                value={formData.companyDomain}
+                onChange={handleChange}
+                className="w-full border border-gray-400 rounded-md px-3 py-2"
+              />
             </div>
           </div>
 
@@ -71,8 +83,13 @@ export const SignUpCompany = () => {
             <label htmlFor="description" className="block text-base font-medium text-gray-800 mb-2">
               Company Description
             </label>
-            <textarea id="description" rows="3" value={formData.description} onChange={handleChange}
-              className="w-full border border-gray-400 rounded-md px-3 py-2"></textarea>
+            <textarea
+              id="description"
+              rows="3"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full border border-gray-400 rounded-md px-3 py-2"
+            ></textarea>
           </div>
 
           {/* Work Culture */}
@@ -80,8 +97,13 @@ export const SignUpCompany = () => {
             <label htmlFor="culture" className="block text-base font-medium text-gray-800 mb-2">
               Company Work Culture
             </label>
-            <textarea id="culture" rows="2" value={formData.culture} onChange={handleChange}
-              className="w-full border border-gray-400 rounded-md px-3 py-2"></textarea>
+            <textarea
+              id="culture"
+              rows="2"
+              value={formData.culture}
+              onChange={handleChange}
+              className="w-full border border-gray-400 rounded-md px-3 py-2"
+            ></textarea>
           </div>
 
           {/* Career Growth */}
@@ -89,8 +111,13 @@ export const SignUpCompany = () => {
             <label htmlFor="careerGrowth" className="block text-base font-medium text-gray-800 mb-2">
               Career Growth and Development
             </label>
-            <textarea id="careerGrowth" rows="2" value={formData.careerGrowth} onChange={handleChange}
-              className="w-full border border-gray-400 rounded-md px-3 py-2"></textarea>
+            <textarea
+              id="careerGrowth"
+              rows="2"
+              value={formData.careerGrowth}
+              onChange={handleChange}
+              className="w-full border border-gray-400 rounded-md px-3 py-2"
+            ></textarea>
           </div>
 
           {/* Legal Disclaimer */}
@@ -98,8 +125,13 @@ export const SignUpCompany = () => {
             <label htmlFor="disclaimer" className="block text-base font-medium text-gray-800 mb-2">
               Legal Disclaimer
             </label>
-            <textarea id="disclaimer" rows="2" value={formData.disclaimer} onChange={handleChange}
-              className="w-full border border-gray-400 rounded-md px-3 py-2"></textarea>
+            <textarea
+              id="disclaimer"
+              rows="2"
+              value={formData.disclaimer}
+              onChange={handleChange}
+              className="w-full border border-gray-400 rounded-md px-3 py-2"
+            ></textarea>
           </div>
 
           {/* Email */}
@@ -107,8 +139,13 @@ export const SignUpCompany = () => {
             <label htmlFor="email" className="block text-base font-medium text-gray-800 mb-2">
               Email
             </label>
-            <input id="email" type="email" value={formData.email} onChange={handleChange}
-              className="w-full border border-gray-400 rounded-md px-3 py-2" />
+            <input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full border border-gray-400 rounded-md px-3 py-2"
+            />
           </div>
 
           {/* Password + Confirm Password */}
@@ -117,27 +154,41 @@ export const SignUpCompany = () => {
               <label htmlFor="password" className="block text-base font-medium text-gray-800 mb-2">
                 Create Password
               </label>
-              <input id="password" type="password" value={formData.password} onChange={handleChange}
-                className="w-full border border-gray-400 rounded-md px-3 py-2" />
+              <input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full border border-gray-400 rounded-md px-3 py-2"
+              />
             </div>
             <div>
               <label htmlFor="confirmPassword" className="block text-base font-medium text-gray-800 mb-2">
                 Confirm Password
               </label>
-              <input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange}
-                className="w-full border border-gray-400 rounded-md px-3 py-2" />
+              <input
+                id="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full border border-gray-400 rounded-md px-3 py-2"
+              />
             </div>
           </div>
 
           {/* Button */}
           <div className="flex flex-col md:flex-row items-center gap-4 ">
-            <button type="submit"
-              className="w-full md:w-44 py-2 bg-[#a9b5df] text-black rounded-md hover:bg-[#9aa5d0] transition-colors">
+            <button
+              type="submit"
+              className="w-full md:w-44 py-2 bg-[#a9b5df] text-black rounded-md hover:bg-[#9aa5d0] transition-colors"
+            >
               Create Account
             </button>
             <p className="text-base">
               Already have an account?{" "}
-              <a href="/commonlogin" className="text-green-600 hover:underline">Login</a>
+              <a href="/commonlogin" className="text-green-600 hover:underline">
+                Login
+              </a>
             </p>
           </div>
         </form>

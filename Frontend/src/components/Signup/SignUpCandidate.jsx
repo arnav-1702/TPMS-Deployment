@@ -34,10 +34,14 @@ export const SignUpCandidate = () => {
         password: form.password,
       });
 
-      // store candidate info in localStorage (you can store more if needed)
-      localStorage.setItem("candidate", JSON.stringify({ name: form.fullName, email: form.email }));
+      // store candidate info in localStorage
+      localStorage.setItem(
+        "candidate",
+        JSON.stringify({ name: form.fullName, email: form.email })
+      );
 
-     navigate("/verify-otp", { state: { email: form.email } });
+      // Directly navigate to login or dashboard instead of verify-otp
+      navigate("/candidate-login");
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
     } finally {
@@ -48,13 +52,18 @@ export const SignUpCandidate = () => {
   return (
     <div className="w-screen h-screen grid grid-cols-1 lg:grid-cols-[3fr_2fr]">
       <div className="flex flex-col justify-center items-start px-8 sm:px-12 md:px-16 lg:px-20 bg-white py-10">
-        <h1 className="text-2xl md:text-3xl font-bold mb-8">Sign Up as a Candidate</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-8">
+          Sign Up as a Candidate
+        </h1>
 
         <form className="w-full space-y-6" onSubmit={handleSubmit}>
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <div>
-            <label htmlFor="fullName" className="block text-base md:text-lg font-medium text-gray-800 mb-2">
+            <label
+              htmlFor="fullName"
+              className="block text-base md:text-lg font-medium text-gray-800 mb-2"
+            >
               Full Name
             </label>
             <input
@@ -67,7 +76,10 @@ export const SignUpCandidate = () => {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-base md:text-lg font-medium text-gray-800 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-base md:text-lg font-medium text-gray-800 mb-2"
+            >
               Email
             </label>
             <input
@@ -80,7 +92,10 @@ export const SignUpCandidate = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-base md:text-lg font-medium text-gray-800 mb-2">
+            <label
+              htmlFor="password"
+              className="block text-base md:text-lg font-medium text-gray-800 mb-2"
+            >
               Create Password
             </label>
             <input
@@ -93,7 +108,10 @@ export const SignUpCandidate = () => {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-base md:text-lg font-medium text-gray-800 mb-2">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-base md:text-lg font-medium text-gray-800 mb-2"
+            >
               Confirm Password
             </label>
             <input
